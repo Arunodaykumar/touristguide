@@ -3403,6 +3403,84 @@ input[name="cardNumber"]:focus {
         font-size: 14px;
     }
 }
+
+/* Global mobile navbar/auth hard-fix (keep this later in file to override older rules) */
+@media (max-width: 768px) {
+    .navbar .nav-container {
+        padding: 10px 12px !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+    }
+
+    .navbar .logo {
+        justify-content: center !important;
+    }
+
+    .navbar .nav-menu {
+        position: static !important;
+        width: 100% !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 10px 14px !important;
+        padding: 0 4px 2px !important;
+        margin: 0 !important;
+        overflow: visible !important;
+    }
+
+    .navbar .nav-menu li {
+        flex: 0 0 auto !important;
+    }
+
+    .navbar .nav-menu a,
+    .navbar .nav-link {
+        white-space: nowrap !important;
+        font-size: 0.98rem !important;
+    }
+
+    .navbar .auth-buttons {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
+    }
+
+    .navbar .auth-buttons .user-menu {
+        width: 100% !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+        align-items: stretch !important;
+    }
+
+    .navbar .auth-buttons .user-menu > span {
+        grid-column: 1 / -1 !important;
+        order: -1 !important;
+        text-align: center !important;
+        font-weight: 700 !important;
+        margin: 0 0 2px !important;
+    }
+
+    .navbar .auth-buttons .btn-notifications,
+    .navbar .auth-buttons .btn-messages,
+    .navbar .auth-buttons .btn-dashboard-link,
+    .navbar .auth-buttons .btn-logout {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 10px 12px !important;
+        border-radius: 12px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        font-size: 0.96rem !important;
+        line-height: 1.2 !important;
+    }
+
+    .navbar .auth-buttons .btn-dashboard-link::before {
+        content: '' !important;
+    }
+}
 /* Animation for notifications */
 @keyframes slideInRight {
     from { transform: translateX(400px); opacity: 0; }
