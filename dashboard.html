@@ -177,8 +177,8 @@
 
             dashboardContent.innerHTML = `
                 <div class="dashboard-header" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 30px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <div style="display: flex; align-items: center; gap: 20px;">
+                    <div class="dashboard-header-top" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div class="dashboard-profile-block" style="display: flex; align-items: center; gap: 20px;">
                             <img src="${updatedCurrentUser.photo || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'}" 
                                  alt="Profile" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
                             <div>
@@ -191,12 +191,14 @@
                                 </p>
                             </div>
                         </div>
-                        <button onclick="loadDashboard()" class="btn-secondary" style="padding: 10px 20px;">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                        <button onclick="addTestBooking()" class="btn-primary" style="padding: 10px 20px; margin-left: 10px;">
-                            <i class="fas fa-plus"></i> Test Booking
-                        </button>
+                        <div class="dashboard-action-row" style="display:flex; gap:10px; align-items:center;">
+                            <button onclick="loadDashboard()" class="btn-secondary" style="padding: 10px 20px;">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                            <button onclick="addTestBooking()" class="btn-primary" style="padding: 10px 20px;">
+                                <i class="fas fa-plus"></i> Test Booking
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -219,7 +221,7 @@
                     </div>` : ''}
                 </div>
 
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+                <div class="dashboard-main-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
                     <div class="bookings-section" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
                         <h2 style="margin: 0 0 20px 0; color: #333;">Recent Bookings</h2>
                         ${bookings.length > 0 ? bookings.slice(0, 5).map(booking => `
@@ -350,13 +352,101 @@
 
     <style>
         @media (max-width: 768px) {
+            .nav-container {
+                padding: 10px 12px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .logo {
+                justify-content: center;
+            }
+
+            .nav-menu {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                gap: 14px;
+                justify-content: flex-start;
+                padding: 0 4px 4px;
+                scrollbar-width: none;
+            }
+
+            .nav-menu::-webkit-scrollbar { display: none; }
+            .nav-menu li { flex: 0 0 auto; }
+            .nav-link { white-space: nowrap; }
+
+            .auth-buttons {
+                width: 100%;
+            }
+
+            .user-menu {
+                width: 100%;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                align-items: center;
+            }
+
+            .user-menu span {
+                grid-column: 1 / -1;
+                text-align: center;
+            }
+
+            .btn-dashboard-link,
+            .btn-logout,
+            .btn-notifications,
+            .btn-messages {
+                width: 100%;
+                justify-content: center;
+                text-align: center;
+            }
+
+            .dashboard-header {
+                padding: 18px !important;
+            }
+
+            .dashboard-header-top {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 14px;
+            }
+
+            .dashboard-profile-block {
+                width: 100%;
+            }
+
+            .dashboard-profile-block img {
+                width: 64px !important;
+                height: 64px !important;
+            }
+
+            .dashboard-action-row {
+                width: 100%;
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .dashboard-action-row .btn-primary,
+            .dashboard-action-row .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+
             .dashboard-stats {
                 grid-template-columns: 1fr 1fr !important;
             }
-            
-            section > div > div > div:last-child {
+
+            .dashboard-main-grid {
                 grid-template-columns: 1fr !important;
                 gap: 20px !important;
+            }
+
+            .booking-item > div {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 10px;
             }
         }
     </style>

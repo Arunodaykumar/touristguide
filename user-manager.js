@@ -197,6 +197,7 @@ class UserManager {
                 name: userData.name,
                 email: userData.email,
                 phone: userData.phone,
+                photo: userData.photo || '',
                 role: userData.role || 'user',
                 preferences: [],
                 bookings: [],
@@ -426,6 +427,14 @@ class UserManager {
                             <input type="password" name="confirmPassword" placeholder="Confirm Password" required id="confirm-password">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="select-label">Profile Photo (Optional)</label>
+                        <div class="input-group">
+                            <i class="fas fa-image"></i>
+                            <input type="file" name="photoFile" id="register-photo" accept="image/*">
+                        </div>
+                        <small style="color:#666; display:block; margin-top:6px;">JPG/PNG. Image will be optimized automatically.</small>
+                    </div>
                     <div class="form-group" id="guide-fields" style="display: none;">
                         <div class="form-row">
                             <div class="form-group">
@@ -563,6 +572,20 @@ class UserManager {
         btnLoader.style.display = 'inline-block';
         submitBtn.disabled = true;
         
+        const photoFile = formData.get('photoFile');
+        let profilePhoto = '';
+        if (photoFile && typeof photoFile === 'object' && photoFile.size > 0) {
+            try {
+                profilePhoto = await this.processProfilePhoto(photoFile);
+            } catch (error) {
+                showNotification('Profile photo processing failed. Please try a smaller image.', 'error');
+                btnText.style.display = 'inline-block';
+                btnLoader.style.display = 'none';
+                submitBtn.disabled = false;
+                return;
+            }
+        }
+
         const result = await this.register({
             name: formData.get('name'),
             email: formData.get('email'),
@@ -572,7 +595,8 @@ class UserManager {
             role: formData.get('role'),
             destination: formData.get('destination'), // Specific destination for guides
             expertise: formData.get('expertise'),
-            bio: formData.get('bio')
+            bio: formData.get('bio'),
+            photo: profilePhoto
         });
         
         // Reset loading state
@@ -637,6 +661,48 @@ class UserManager {
                 }
             });
         }
+    }
+
+    processProfilePhoto(file, maxWidth = 420, quality = 0.78) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const maxDataUrlLength = 160000;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > maxWidth) {
+                        const ratio = maxWidth / width;
+                        width = maxWidth;
+                        height = Math.round(height * ratio);
+                    }
+
+                    const render = (q) => {
+                        canvas.width = Math.max(1, Math.round(width));
+                        canvas.height = Math.max(1, Math.round(height));
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        return canvas.toDataURL('image/jpeg', q);
+                    };
+
+                    let q = quality;
+                    let output = render(q);
+                    while (output.length > maxDataUrlLength && q > 0.5) {
+                        q -= 0.07;
+                        output = render(q);
+                    }
+                    resolve(output);
+                };
+                img.onerror = reject;
+                img.src = e.target.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
     }
     
     checkPasswordStrength(password) {
