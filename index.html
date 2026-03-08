@@ -463,18 +463,18 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero hero-vibrant">
-        <div class="hero-background">
+        <div class="hero-background" id="hero-background">
             <div class="hero-overlay hero-overlay-vibrant"></div>
         </div>
         <div class="hero-content hero-content-vibrant">
-            <h1 class="hero-title hero-title-vibrant">Explore the World's Best Destinations</h1>
-            <p class="hero-subtitle hero-subtitle-vibrant">Your ultimate guide to unforgettable travel experiences</p>
+            <h1 id="hero-title" class="hero-title hero-title-vibrant">Explore the World's Best Destinations</h1>
+            <p id="hero-subtitle" class="hero-subtitle hero-subtitle-vibrant">Your ultimate guide to unforgettable travel experiences</p>
             <div class="hero-buttons hero-buttons-vibrant">
                 <button onclick="displayFallbackDestinations()" class="btn-primary btn-primary-vibrant">
-                    <i class="fas fa-compass"></i> Discover Now
+                    <i class="fas fa-compass"></i> <span id="hero-primary-btn-text">Discover Now</span>
                 </button>
                 <button onclick="scrollToSection('gallery')" class="btn-secondary btn-secondary-vibrant">
-                    <i class="fas fa-play"></i> Watch Video
+                    <i class="fas fa-play"></i> <span id="hero-secondary-btn-text">Watch Video</span>
                 </button>
             </div>
         </div>
@@ -1240,6 +1240,7 @@
             }
 
             updateLogoOnPage();
+            applyHeroSettings();
             updateFooterContactInfo();
             
             // Monitor destination container for changes
@@ -1316,6 +1317,9 @@
             if (!e.key || ['contactEmail', 'supportEmail', 'contactPhone', 'contactAddress'].includes(e.key)) {
                 updateFooterContactInfo();
             }
+            if (!e.key || ['heroTitle', 'heroSubtitle', 'heroPrimaryBtnText', 'heroSecondaryBtnText', 'heroBackgroundImage'].includes(e.key)) {
+                applyHeroSettings();
+            }
         });
         
         // Listen for custom events for same-tab updates
@@ -1324,6 +1328,8 @@
         });
         window.addEventListener('settingsUpdated', updateFooterContactInfo);
         window.addEventListener('remoteStatePulled', updateFooterContactInfo);
+        window.addEventListener('settingsUpdated', applyHeroSettings);
+        window.addEventListener('remoteStatePulled', applyHeroSettings);
         
         function updateLogoOnPage() {
             const savedLogo = localStorage.getItem('siteLogo');
@@ -1345,6 +1351,31 @@
             if (savedName) {
                 const nameElements = document.querySelectorAll('.logo span, .footer-logo span');
                 nameElements.forEach(el => el.textContent = savedName);
+            }
+        }
+
+        function applyHeroSettings() {
+            const heroTitle = localStorage.getItem('heroTitle') || "Explore the World's Best Destinations";
+            const heroSubtitle = localStorage.getItem('heroSubtitle') || 'Your ultimate guide to unforgettable travel experiences';
+            const heroPrimaryBtnText = localStorage.getItem('heroPrimaryBtnText') || 'Discover Now';
+            const heroSecondaryBtnText = localStorage.getItem('heroSecondaryBtnText') || 'Watch Video';
+            const heroBackgroundImage = localStorage.getItem('heroBackgroundImage') || '';
+
+            const titleEl = document.getElementById('hero-title');
+            const subtitleEl = document.getElementById('hero-subtitle');
+            const primaryBtnEl = document.getElementById('hero-primary-btn-text');
+            const secondaryBtnEl = document.getElementById('hero-secondary-btn-text');
+            const bgEl = document.getElementById('hero-background');
+
+            if (titleEl) titleEl.textContent = heroTitle;
+            if (subtitleEl) subtitleEl.textContent = heroSubtitle;
+            if (primaryBtnEl) primaryBtnEl.textContent = heroPrimaryBtnText;
+            if (secondaryBtnEl) secondaryBtnEl.textContent = heroSecondaryBtnText;
+            if (bgEl && heroBackgroundImage) {
+                bgEl.style.backgroundImage = `url('${heroBackgroundImage}')`;
+                bgEl.style.backgroundSize = 'cover';
+                bgEl.style.backgroundPosition = 'center';
+                bgEl.style.backgroundRepeat = 'no-repeat';
             }
         }
 
