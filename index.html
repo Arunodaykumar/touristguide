@@ -429,6 +429,14 @@
                 padding-top: 72px;
             }
 
+            #hero-background,
+            .hero-background {
+                animation: none !important;
+                transform: none !important;
+                background-position: center top !important;
+                background-size: cover !important;
+            }
+
             .hero-content-vibrant {
                 padding: 92px 16px 52px;
             }
@@ -467,6 +475,11 @@
         }
 
         @media (max-width: 480px) {
+            #hero-background,
+            .hero-background {
+                background-position: 58% top !important;
+            }
+
             .hero-title-vibrant {
                 font-size: 1.8rem;
             }
