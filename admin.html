@@ -238,6 +238,16 @@
             color: #667eea;
             font-size: 28px;
         }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-wrap table {
+            min-width: 760px;
+        }
         
         .form-group textarea {
             width: 100%;
@@ -246,6 +256,69 @@
             border-radius: 8px;
             resize: vertical;
             font-family: inherit;
+        }
+
+        @media (max-width: 900px) {
+            .admin-header {
+                flex-wrap: wrap;
+                gap: 10px;
+                padding: 14px;
+            }
+
+            .admin-header h1 {
+                font-size: 20px;
+                word-break: break-word;
+            }
+
+            .logout-btn {
+                width: 100%;
+            }
+
+            .admin-content {
+                padding: 14px;
+            }
+
+            .admin-nav {
+                padding: 10px 0;
+            }
+
+            .admin-nav ul {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 8px;
+                padding: 0 10px;
+                width: 100%;
+            }
+
+            .admin-nav li {
+                width: 100%;
+            }
+
+            .admin-nav a {
+                display: block;
+                width: 100%;
+                text-align: center;
+                padding: 7px 10px;
+                font-size: 13px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 16px;
+            }
+
+            .modal-content {
+                width: 98%;
+                margin: 1% auto;
+            }
+
+            .modal-body {
+                padding: 16px;
+            }
         }
     </style>
 </head>
@@ -674,8 +747,8 @@
             // Load users table
             const usersTable = document.getElementById('users-table');
             if (allUsers.length > 0) {
-                usersTable.innerHTML = '<table style="width:100%; border-collapse: collapse; background:white; border-radius:10px; overflow:hidden;"><tr style="background:#f8f9fa;"><th style="padding:15px; border:1px solid #ddd;">Name</th><th style="padding:15px; border:1px solid #ddd;">Email</th><th style="padding:15px; border:1px solid #ddd;">Phone</th><th style="padding:15px; border:1px solid #ddd;">Role</th><th style="padding:15px; border:1px solid #ddd;">Actions</th></tr>' + 
-                allUsers.map(user => `<tr><td style="padding:15px; border:1px solid #ddd;">${user.name}</td><td style="padding:15px; border:1px solid #ddd;">${user.email}</td><td style="padding:15px; border:1px solid #ddd;">${user.phone || 'N/A'}</td><td style="padding:15px; border:1px solid #ddd;"><span style="background:${user.role === 'guide' ? '#3498db' : '#95a5a6'}; color:white; padding:4px 8px; border-radius:4px; font-size:12px;">${user.role || 'user'}</span></td><td style="padding:15px; border:1px solid #ddd;"><button onclick="deleteUser(${user.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">Delete</button></td></tr>`).join('') + '</table>';
+                usersTable.innerHTML = '<div class="table-wrap"><table style="width:100%; border-collapse: collapse; background:white; border-radius:10px; overflow:hidden;"><tr style="background:#f8f9fa;"><th style="padding:15px; border:1px solid #ddd;">Name</th><th style="padding:15px; border:1px solid #ddd;">Email</th><th style="padding:15px; border:1px solid #ddd;">Phone</th><th style="padding:15px; border:1px solid #ddd;">Role</th><th style="padding:15px; border:1px solid #ddd;">Actions</th></tr>' + 
+                allUsers.map(user => `<tr><td style="padding:15px; border:1px solid #ddd;">${user.name}</td><td style="padding:15px; border:1px solid #ddd;">${user.email}</td><td style="padding:15px; border:1px solid #ddd;">${user.phone || 'N/A'}</td><td style="padding:15px; border:1px solid #ddd;"><span style="background:${user.role === 'guide' ? '#3498db' : '#95a5a6'}; color:white; padding:4px 8px; border-radius:4px; font-size:12px;">${user.role || 'user'}</span></td><td style="padding:15px; border:1px solid #ddd;"><button onclick="deleteUser(${user.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">Delete</button></td></tr>`).join('') + '</table></div>';
             } else {
                 usersTable.innerHTML = '<div style="background:white; padding:20px; border-radius:10px;">No users found</div>';
             }
@@ -683,8 +756,8 @@
             // Load guides table
             const guidesTable = document.getElementById('guides-table');
             if (guides.length > 0) {
-                guidesTable.innerHTML = '<table style="width:100%; border-collapse: collapse; background:white; border-radius:10px; overflow:hidden;"><tr style="background:#f8f9fa;"><th style="padding:15px; border:1px solid #ddd;">Name</th><th style="padding:15px; border:1px solid #ddd;">Destination</th><th style="padding:15px; border:1px solid #ddd;">Expertise</th><th style="padding:15px; border:1px solid #ddd;">Rate</th></tr>' + 
-                guides.map(guide => `<tr><td style="padding:15px; border:1px solid #ddd;">${guide.name}</td><td style="padding:15px; border:1px solid #ddd;">${guide.destination || guide.location || 'India'}</td><td style="padding:15px; border:1px solid #ddd;">${guide.expertise || 'General Tours'}</td><td style="padding:15px; border:1px solid #ddd;">₹${guide.rate || 100}/hr</td></tr>`).join('') + '</table>';
+                guidesTable.innerHTML = '<div class="table-wrap"><table style="width:100%; border-collapse: collapse; background:white; border-radius:10px; overflow:hidden;"><tr style="background:#f8f9fa;"><th style="padding:15px; border:1px solid #ddd;">Name</th><th style="padding:15px; border:1px solid #ddd;">Destination</th><th style="padding:15px; border:1px solid #ddd;">Expertise</th><th style="padding:15px; border:1px solid #ddd;">Rate</th></tr>' + 
+                guides.map(guide => `<tr><td style="padding:15px; border:1px solid #ddd;">${guide.name}</td><td style="padding:15px; border:1px solid #ddd;">${guide.destination || guide.location || 'India'}</td><td style="padding:15px; border:1px solid #ddd;">${guide.expertise || 'General Tours'}</td><td style="padding:15px; border:1px solid #ddd;">₹${guide.rate || 100}/hr</td></tr>`).join('') + '</table></div>';
             } else {
                 guidesTable.innerHTML = '<div style="background:white; padding:20px; border-radius:10px;">No guides found</div>';
             }
@@ -692,8 +765,8 @@
             // Load bookings table
             const bookingsTable = document.getElementById('bookings-table');
             if (userBookings.length > 0) {
-                bookingsTable.innerHTML = '<table style="width:100%; border-collapse: collapse; background:white; border-radius:10px; overflow:hidden;"><tr style="background:#f8f9fa;"><th style="padding:15px; border:1px solid #ddd;">Service</th><th style="padding:15px; border:1px solid #ddd;">Date</th><th style="padding:15px; border:1px solid #ddd;">Amount</th><th style="padding:15px; border:1px solid #ddd;">Status</th></tr>' + 
-                userBookings.map(booking => `<tr><td style="padding:15px; border:1px solid #ddd;">${booking.guide || booking.destination || 'N/A'}</td><td style="padding:15px; border:1px solid #ddd;">${booking.date || 'N/A'}</td><td style="padding:15px; border:1px solid #ddd;">₹${booking.amount || 0}</td><td style="padding:15px; border:1px solid #ddd;"><span style="background:#27ae60; color:white; padding:4px 8px; border-radius:4px; font-size:12px;">${booking.status || 'Confirmed'}</span></td></tr>`).join('') + '</table>';
+                bookingsTable.innerHTML = '<div class="table-wrap"><table style="width:100%; border-collapse: collapse; background:white; border-radius:10px; overflow:hidden;"><tr style="background:#f8f9fa;"><th style="padding:15px; border:1px solid #ddd;">Service</th><th style="padding:15px; border:1px solid #ddd;">Date</th><th style="padding:15px; border:1px solid #ddd;">Amount</th><th style="padding:15px; border:1px solid #ddd;">Status</th></tr>' + 
+                userBookings.map(booking => `<tr><td style="padding:15px; border:1px solid #ddd;">${booking.guide || booking.destination || 'N/A'}</td><td style="padding:15px; border:1px solid #ddd;">${booking.date || 'N/A'}</td><td style="padding:15px; border:1px solid #ddd;">₹${booking.amount || 0}</td><td style="padding:15px; border:1px solid #ddd;"><span style="background:#27ae60; color:white; padding:4px 8px; border-radius:4px; font-size:12px;">${booking.status || 'Confirmed'}</span></td></tr>`).join('') + '</table></div>';
             } else {
                 bookingsTable.innerHTML = '<div style="background:white; padding:20px; border-radius:10px;">No bookings found</div>';
             }
@@ -701,8 +774,8 @@
             // Load destinations table
             const destinationsTable = document.getElementById('destinations-table');
             if (allDestinations.length > 0) {
-                destinationsTable.innerHTML = '<table style="width:100%; border-collapse: collapse; background:white; border-radius:10px; overflow:hidden;"><tr style="background:#f8f9fa;"><th style="padding:15px; border:1px solid #ddd;">Name</th><th style="padding:15px; border:1px solid #ddd;">Country</th><th style="padding:15px; border:1px solid #ddd;">Category</th><th style="padding:15px; border:1px solid #ddd;">Rating</th><th style="padding:15px; border:1px solid #ddd;">Actions</th></tr>' + 
-                allDestinations.map(dest => `<tr><td style="padding:15px; border:1px solid #ddd;">${dest.name}</td><td style="padding:15px; border:1px solid #ddd;">${dest.country || 'India'}</td><td style="padding:15px; border:1px solid #ddd;">${dest.category}</td><td style="padding:15px; border:1px solid #ddd;">${dest.rating} /5</td><td style="padding:15px; border:1px solid #ddd;"><button onclick='editDestination("${encodeURIComponent(dest.name)}")' style="background:#3498db; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer; margin-right:5px;">Edit</button><button onclick='deleteDestination("${encodeURIComponent(dest.name)}")' style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">Delete</button></td></tr>`).join('') + '</table>';
+                destinationsTable.innerHTML = '<div class="table-wrap"><table style="width:100%; border-collapse: collapse; background:white; border-radius:10px; overflow:hidden;"><tr style="background:#f8f9fa;"><th style="padding:15px; border:1px solid #ddd;">Name</th><th style="padding:15px; border:1px solid #ddd;">Country</th><th style="padding:15px; border:1px solid #ddd;">Category</th><th style="padding:15px; border:1px solid #ddd;">Rating</th><th style="padding:15px; border:1px solid #ddd;">Actions</th></tr>' + 
+                allDestinations.map(dest => `<tr><td style="padding:15px; border:1px solid #ddd;">${dest.name}</td><td style="padding:15px; border:1px solid #ddd;">${dest.country || 'India'}</td><td style="padding:15px; border:1px solid #ddd;">${dest.category}</td><td style="padding:15px; border:1px solid #ddd;">${dest.rating} /5</td><td style="padding:15px; border:1px solid #ddd;"><button onclick='editDestination("${encodeURIComponent(dest.name)}")' style="background:#3498db; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer; margin-right:5px;">Edit</button><button onclick='deleteDestination("${encodeURIComponent(dest.name)}")' style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">Delete</button></td></tr>`).join('') + '</table></div>';
             } else {
                 destinationsTable.innerHTML = '<div style="background:white; padding:20px; border-radius:10px;">No destinations found</div>';
             }
