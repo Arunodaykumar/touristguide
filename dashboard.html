@@ -82,14 +82,14 @@
 
                 authButtons.innerHTML = `
                     <div class="user-menu">
+                        <span class="user-welcome-text">Welcome, ${currentUser.name}</span>
                         <button onclick="userManager.showNotifications()" class="btn-notifications">
-                            <i class="fas fa-bell"></i>${notificationBadge}
+                            <i class="fas fa-bell"></i> Alerts${notificationBadge}
                         </button>
                         <button onclick="userManager.showMessages()" class="btn-messages">
-                            <i class="fas fa-envelope"></i>
+                            <i class="fas fa-envelope"></i> Inbox
                         </button>
                         <a href="dashboard.html" class="btn-dashboard-link">Dashboard</a>
-                        <span>Welcome, ${currentUser.name}</span>
                         <button onclick="userManager.logout()" class="btn-logout">Logout</button>
                     </div>
                 `;
@@ -151,6 +151,12 @@
             syncNavbarAuthState();
 
             const updatedCurrentUser = userData;
+            const joinDateText = (() => {
+                const raw = updatedCurrentUser.joinDate;
+                if (!raw) return 'Recently joined';
+                const parsed = new Date(raw);
+                return Number.isNaN(parsed.getTime()) ? 'Recently joined' : parsed.toLocaleDateString();
+            })();
             const directBookings = userData.bookings || [];
             const inferredGuideBookings = userData.role === 'guide'
                 ? allUsers
@@ -187,7 +193,7 @@
                                     ${updatedCurrentUser.role === 'guide' ? '🎯 Tour Guide' : '🧳 Traveler'}
                                 </p>
                                 <p style="margin: 5px 0 0 0; color: #999; font-size: 0.9rem;">
-                                    Member since ${new Date(updatedCurrentUser.joinDate).toLocaleDateString()}
+                                    Member since ${joinDateText}
                                 </p>
                             </div>
                         </div>
@@ -389,9 +395,12 @@
                 align-items: center;
             }
 
-            .user-menu span {
+            .user-welcome-text {
                 grid-column: 1 / -1;
                 text-align: center;
+                font-size: 1rem;
+                font-weight: 700;
+                margin-bottom: 2px;
             }
 
             .btn-dashboard-link,
@@ -401,6 +410,14 @@
                 width: 100%;
                 justify-content: center;
                 text-align: center;
+                margin-right: 0 !important;
+                padding: 10px 12px !important;
+                border-radius: 14px !important;
+                font-size: 0.95rem;
+            }
+
+            .btn-dashboard-link::before {
+                content: '' !important;
             }
 
             .dashboard-header {
@@ -432,6 +449,8 @@
             .dashboard-action-row .btn-secondary {
                 width: 100%;
                 justify-content: center;
+                padding: 10px 12px !important;
+                border-radius: 12px !important;
             }
 
             .dashboard-stats {
