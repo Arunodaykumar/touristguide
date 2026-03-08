@@ -1,5 +1,6 @@
 (function () {
     const SYNC_KEYS = ['destinations', 'allUsers', 'bookings', 'deletedDefaultDestinations'];
+    const SETTINGS_KEYS = ['siteLogo', 'siteName', 'contactEmail', 'supportEmail', 'currency', 'taxRate', 'lastUpdated'];
     const SUPABASE_URL =
         localStorage.getItem('SUPABASE_URL') ||
         'https://ghidvuoipfndpfqyhidz.supabase.co';
@@ -9,6 +10,7 @@
 
     let initialized = false;
     let pushTimer = null;
+    let suppressPush = false;
 
     function safeJsonParse(value, fallback) {
         try {
@@ -26,6 +28,12 @@
             payload[key] = safeJsonParse(raw, []);
         });
         return payload;
+    }
+
+    function getLocalSettingsRows() {
+        return SETTINGS_KEYS
+            .map((key) => ({ key, value_text: localStorage.getItem(key) }))
+            .filter((row) => row.value_text != null);
     }
 
     function supabaseFetch(path, options = {}) {
@@ -167,17 +175,30 @@
         }
     }
 
-    function pruneLargeStrings(value) {
+    async function upsertSettings(rows) {
+        if (!Array.isArray(rows) || rows.length === 0) return;
+        const insertRes = await supabaseFetch('/rest/v1/app_settings?on_conflict=key', {
+            method: 'POST',
+            headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+            body: JSON.stringify(rows)
+        });
+        if (!insertRes.ok) {
+            const errText = await insertRes.text();
+            throw new Error(`Upsert app_settings failed: ${insertRes.status} ${errText}`);
+        }
+    }
+
+    function pruneLargeStrings(value, maxDataUrlLength = 200000) {
         if (value == null) return value;
         if (typeof value === 'string') {
-            if (value.startsWith('data:') && value.length > 200000) return '';
+            if (value.startsWith('data:') && value.length > maxDataUrlLength) return '';
             return value;
         }
-        if (Array.isArray(value)) return value.map(pruneLargeStrings);
+        if (Array.isArray(value)) return value.map((item) => pruneLargeStrings(item, maxDataUrlLength));
         if (typeof value === 'object') {
             const out = {};
             Object.keys(value).forEach((k) => {
-                out[k] = pruneLargeStrings(value[k]);
+                out[k] = pruneLargeStrings(value[k], maxDataUrlLength);
             });
             return out;
         }
@@ -196,6 +217,7 @@
 
     async function pullRemoteState() {
         try {
+            suppressPush = true;
             const [destRes, usersRes, bookingsRes] = await Promise.all([
                 supabaseFetch('/rest/v1/destinations?select=*'),
                 supabaseFetch('/rest/v1/users?select=*'),
@@ -216,10 +238,25 @@
             localStorage.setItem('allUsers', JSON.stringify((userRows || []).map(mapUserFromDb)));
             localStorage.setItem('bookings', JSON.stringify((bookingRows || []).map(mapBookingFromDb)));
 
+            try {
+                const settingsRes = await supabaseFetch('/rest/v1/app_settings?select=key,value_text');
+                if (settingsRes.ok) {
+                    const settingsRows = await settingsRes.json();
+                    (settingsRows || []).forEach((row) => {
+                        if (!row || !row.key) return;
+                        localStorage.setItem(String(row.key), row.value_text == null ? '' : String(row.value_text));
+                    });
+                }
+            } catch (settingsErr) {
+                console.warn('Supabase settings pull skipped:', settingsErr.message || settingsErr);
+            }
+
             syncCurrentUserFromAllUsers();
             window.dispatchEvent(new CustomEvent('remoteStatePulled'));
         } catch (error) {
             console.warn('Supabase pull skipped:', error.message || error);
+        } finally {
+            suppressPush = false;
         }
     }
 
@@ -235,6 +272,12 @@
             const bookings = Array.isArray(payload.bookings)
                 ? payload.bookings.map((b) => pruneLargeStrings(mapBookingForDb(b)))
                 : [];
+            const settingsRows = getLocalSettingsRows().map((row) => ({
+                key: row.key,
+                value_text: row.key === 'siteLogo'
+                    ? pruneLargeStrings(row.value_text, 600000)
+                    : pruneLargeStrings(row.value_text)
+            }));
 
             let syncedAny = false;
             try {
@@ -254,6 +297,12 @@
                 syncedAny = true;
             } catch (err) {
                 console.warn('Supabase bookings upsert failed:', err.message || err);
+            }
+            try {
+                await upsertSettings(settingsRows);
+                syncedAny = true;
+            } catch (err) {
+                console.warn('Supabase settings upsert failed:', err.message || err);
             }
 
             if (!syncedAny) throw new Error('No table synced');
@@ -275,17 +324,27 @@
         if (initialized) return;
         initialized = true;
 
+        const originalSetItem = localStorage.setItem.bind(localStorage);
+        localStorage.setItem = function patchedSetItem(key, value) {
+            originalSetItem(key, value);
+            if (suppressPush) return;
+            if (!key || SYNC_KEYS.includes(key) || SETTINGS_KEYS.includes(key) || key === 'currentUser') {
+                schedulePush(250);
+            }
+        };
+
         pullRemoteState().finally(() => {
             schedulePush(1200);
         });
 
         window.addEventListener('storage', (event) => {
-            if (!event.key || SYNC_KEYS.includes(event.key) || event.key === 'currentUser') {
+            if (!event.key || SYNC_KEYS.includes(event.key) || SETTINGS_KEYS.includes(event.key) || event.key === 'currentUser') {
                 schedulePush();
             }
         });
 
         window.addEventListener('destinationsUpdated', () => schedulePush());
+        window.addEventListener('settingsUpdated', () => schedulePush());
         window.addEventListener('focus', () => pullRemoteState());
         setInterval(() => pullRemoteState(), 20000);
     }

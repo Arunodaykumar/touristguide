@@ -589,7 +589,7 @@
         </div>
     </div>
 
-    <script src="remote-sync.js?v=5"></script>
+    <script src="remote-sync.js?v=6"></script>
     <script>
         // Login functionality
         document.getElementById('login-form').addEventListener('submit', function(e) {
@@ -1123,15 +1123,35 @@
             if (logoFile) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    localStorage.setItem('siteLogo', e.target.result);
-                    localStorage.setItem('lastUpdated', new Date().toLocaleString());
-                    document.getElementById('logo-preview').innerHTML = `<img src="${e.target.result}" style="max-width:200px; max-height:80px; object-fit:contain;">`;
-                    alert('Settings saved successfully! Logo and site name updated.');
-                    loadData();
+                    const image = new Image();
+                    image.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const maxWidth = 320;
+                        const maxHeight = 100;
+                        const scale = Math.min(maxWidth / image.width, maxHeight / image.height, 1);
+                        canvas.width = Math.max(1, Math.round(image.width * scale));
+                        canvas.height = Math.max(1, Math.round(image.height * scale));
+                        const ctx = canvas.getContext('2d');
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+                        const optimizedLogo = canvas.toDataURL('image/webp', 0.82);
+                        localStorage.setItem('siteLogo', optimizedLogo);
+                        localStorage.setItem('lastUpdated', new Date().toLocaleString());
+                        window.dispatchEvent(new CustomEvent('settingsUpdated'));
+                        document.getElementById('logo-preview').innerHTML = `<img src="${optimizedLogo}" style="max-width:200px; max-height:80px; object-fit:contain;">`;
+                        alert('Settings saved successfully! Logo and site name updated.');
+                        loadData();
+                    };
+                    image.onerror = function() {
+                        alert('Logo processing failed. Please try a smaller image.');
+                    };
+                    image.src = e.target.result;
                 };
                 reader.readAsDataURL(logoFile);
             } else {
                 localStorage.setItem('lastUpdated', new Date().toLocaleString());
+                window.dispatchEvent(new CustomEvent('settingsUpdated'));
                 alert('Settings saved successfully!');
                 loadData();
             }
@@ -1143,6 +1163,7 @@
             localStorage.setItem('contactEmail', contactEmail);
             localStorage.setItem('supportEmail', supportEmail);
             localStorage.setItem('lastUpdated', new Date().toLocaleString());
+            window.dispatchEvent(new CustomEvent('settingsUpdated'));
             alert('Email settings saved successfully!');
             updateSystemInfo();
         }
@@ -1153,6 +1174,7 @@
             localStorage.setItem('currency', currency);
             localStorage.setItem('taxRate', taxRate);
             localStorage.setItem('lastUpdated', new Date().toLocaleString());
+            window.dispatchEvent(new CustomEvent('settingsUpdated'));
             alert('Payment settings saved successfully!');
             updateSystemInfo();
         }
