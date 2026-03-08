@@ -62,10 +62,11 @@
     }
 
     function mapUserForDb(user) {
+        const emailValue = String(user.email || '').trim();
         return {
             id: normalizeId(user.id || user.email || user.name, 'user'),
             name: user.name || '',
-            email: user.email || '',
+            email: emailValue || null,
             role: user.role || 'tourist',
             phone: user.phone || '',
             password: user.password || '',
@@ -166,6 +167,23 @@
         }
     }
 
+    function pruneLargeStrings(value) {
+        if (value == null) return value;
+        if (typeof value === 'string') {
+            if (value.startsWith('data:') && value.length > 200000) return '';
+            return value;
+        }
+        if (Array.isArray(value)) return value.map(pruneLargeStrings);
+        if (typeof value === 'object') {
+            const out = {};
+            Object.keys(value).forEach((k) => {
+                out[k] = pruneLargeStrings(value[k]);
+            });
+            return out;
+        }
+        return value;
+    }
+
     function syncCurrentUserFromAllUsers() {
         const currentUser = safeJsonParse(localStorage.getItem('currentUser') || 'null', null);
         if (!currentUser || !currentUser.id) return;
@@ -208,13 +226,37 @@
     async function pushRemoteState() {
         try {
             const payload = getLocalState();
-            const destinations = Array.isArray(payload.destinations) ? payload.destinations.map(mapDestinationForDb) : [];
-            const users = Array.isArray(payload.allUsers) ? payload.allUsers.map(mapUserForDb) : [];
-            const bookings = Array.isArray(payload.bookings) ? payload.bookings.map(mapBookingForDb) : [];
+            const destinations = Array.isArray(payload.destinations)
+                ? payload.destinations.map((d) => pruneLargeStrings(mapDestinationForDb(d)))
+                : [];
+            const users = Array.isArray(payload.allUsers)
+                ? payload.allUsers.map((u) => pruneLargeStrings(mapUserForDb(u)))
+                : [];
+            const bookings = Array.isArray(payload.bookings)
+                ? payload.bookings.map((b) => pruneLargeStrings(mapBookingForDb(b)))
+                : [];
 
-            await upsertTable('destinations', destinations);
-            await upsertTable('users', users);
-            await upsertTable('bookings', bookings);
+            let syncedAny = false;
+            try {
+                await upsertTable('destinations', destinations);
+                syncedAny = true;
+            } catch (err) {
+                console.warn('Supabase destinations upsert failed:', err.message || err);
+            }
+            try {
+                await upsertTable('users', users);
+                syncedAny = true;
+            } catch (err) {
+                console.warn('Supabase users upsert failed:', err.message || err);
+            }
+            try {
+                await upsertTable('bookings', bookings);
+                syncedAny = true;
+            } catch (err) {
+                console.warn('Supabase bookings upsert failed:', err.message || err);
+            }
+
+            if (!syncedAny) throw new Error('No table synced');
 
             window.dispatchEvent(new CustomEvent('remoteStatePushed'));
         } catch (error) {
