@@ -584,9 +584,9 @@
                 <div class="footer-section">
                     <h3>Contact Info</h3>
                     <div class="contact-info">
-                        <p><i class="fas fa-envelope"></i> info@touristguide.com</p>
-                        <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
-                        <p><i class="fas fa-map-marker-alt"></i> New York, NY 10001</p>
+                        <p><i class="fas fa-envelope"></i> <span id="footer-contact-email">info@touristguide.com</span></p>
+                        <p><i class="fas fa-phone"></i> <span id="footer-contact-phone">+91 9876543210</span></p>
+                        <p><i class="fas fa-map-marker-alt"></i> <span id="footer-contact-address">New Delhi, India</span></p>
                     </div>
                 </div>
             </div>
@@ -1240,6 +1240,7 @@
             }
 
             updateLogoOnPage();
+            updateFooterContactInfo();
             
             // Monitor destination container for changes
             monitorDestinationContainer();
@@ -1312,12 +1313,17 @@
             if (e.key === 'destinations') {
                 displayFallbackDestinations();
             }
+            if (!e.key || ['contactEmail', 'supportEmail', 'contactPhone', 'contactAddress'].includes(e.key)) {
+                updateFooterContactInfo();
+            }
         });
         
         // Listen for custom events for same-tab updates
         window.addEventListener('destinationsUpdated', function() {
             displayFallbackDestinations();
         });
+        window.addEventListener('settingsUpdated', updateFooterContactInfo);
+        window.addEventListener('remoteStatePulled', updateFooterContactInfo);
         
         function updateLogoOnPage() {
             const savedLogo = localStorage.getItem('siteLogo');
@@ -1340,6 +1346,20 @@
                 const nameElements = document.querySelectorAll('.logo span, .footer-logo span');
                 nameElements.forEach(el => el.textContent = savedName);
             }
+        }
+
+        function updateFooterContactInfo() {
+            const contactEmail = localStorage.getItem('contactEmail') || localStorage.getItem('supportEmail') || 'info@touristguide.com';
+            const contactPhone = localStorage.getItem('contactPhone') || '+91 9876543210';
+            const contactAddress = localStorage.getItem('contactAddress') || 'New Delhi, India';
+
+            const emailEl = document.getElementById('footer-contact-email');
+            const phoneEl = document.getElementById('footer-contact-phone');
+            const addressEl = document.getElementById('footer-contact-address');
+
+            if (emailEl) emailEl.textContent = contactEmail;
+            if (phoneEl) phoneEl.textContent = contactPhone;
+            if (addressEl) addressEl.textContent = contactAddress;
         }
 
         function setupEventListeners() {
