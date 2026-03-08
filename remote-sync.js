@@ -206,14 +206,55 @@
 
     async function upsertSettings(rows) {
         if (!Array.isArray(rows) || rows.length === 0) return;
-        const insertRes = await supabaseFetch('/rest/v1/app_settings?on_conflict=key', {
-            method: 'POST',
-            headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
-            body: JSON.stringify(rows)
-        });
-        if (!insertRes.ok) {
-            const errText = await insertRes.text();
-            throw new Error(`Upsert app_settings failed: ${insertRes.status} ${errText}`);
+        const maxBatchChars = 180000;
+        let batch = [];
+        let currentSize = 2;
+
+        for (const row of rows) {
+            const rowText = JSON.stringify(row);
+            const rowSize = rowText.length + 1;
+
+            if (rowSize > maxBatchChars) {
+                const singleRes = await supabaseFetch('/rest/v1/app_settings?on_conflict=key', {
+                    method: 'POST',
+                    headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+                    body: JSON.stringify([row])
+                });
+                if (!singleRes.ok) {
+                    const errText = await singleRes.text();
+                    throw new Error(`Upsert app_settings failed: ${singleRes.status} ${errText}`);
+                }
+                continue;
+            }
+
+            if (currentSize + rowSize > maxBatchChars && batch.length > 0) {
+                const batchRes = await supabaseFetch('/rest/v1/app_settings?on_conflict=key', {
+                    method: 'POST',
+                    headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+                    body: JSON.stringify(batch)
+                });
+                if (!batchRes.ok) {
+                    const errText = await batchRes.text();
+                    throw new Error(`Upsert app_settings failed: ${batchRes.status} ${errText}`);
+                }
+                batch = [];
+                currentSize = 2;
+            }
+
+            batch.push(row);
+            currentSize += rowSize;
+        }
+
+        if (batch.length > 0) {
+            const insertRes = await supabaseFetch('/rest/v1/app_settings?on_conflict=key', {
+                method: 'POST',
+                headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+                body: JSON.stringify(batch)
+            });
+            if (!insertRes.ok) {
+                const errText = await insertRes.text();
+                throw new Error(`Upsert app_settings failed: ${insertRes.status} ${errText}`);
+            }
         }
     }
 
@@ -303,7 +344,7 @@
                 : [];
             const settingsRows = getLocalSettingsRows().map((row) => ({
                 key: row.key,
-                value_text: row.key === 'siteLogo'
+                value_text: (row.key === 'siteLogo' || row.key === 'heroBackgroundImage')
                     ? pruneLargeStrings(row.value_text, 600000)
                     : pruneLargeStrings(row.value_text)
             }));
