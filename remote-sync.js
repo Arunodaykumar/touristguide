@@ -162,8 +162,7 @@
         };
     }
 
-    async function upsertTable(table, rows) {
-        if (!Array.isArray(rows) || rows.length === 0) return;
+    async function postUpsertRows(table, rows) {
         const insertRes = await supabaseFetch(`/rest/v1/${table}?on_conflict=id`, {
             method: 'POST',
             headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
@@ -172,6 +171,36 @@
         if (!insertRes.ok) {
             const errText = await insertRes.text();
             throw new Error(`Upsert ${table} failed: ${insertRes.status} ${errText}`);
+        }
+    }
+
+    async function upsertTable(table, rows) {
+        if (!Array.isArray(rows) || rows.length === 0) return;
+        const maxBatchChars = 180000;
+        let batch = [];
+        let currentSize = 2;
+
+        for (const row of rows) {
+            const rowText = JSON.stringify(row);
+            const rowSize = rowText.length + 1;
+
+            if (rowSize > maxBatchChars) {
+                await postUpsertRows(table, [row]);
+                continue;
+            }
+
+            if (currentSize + rowSize > maxBatchChars && batch.length > 0) {
+                await postUpsertRows(table, batch);
+                batch = [];
+                currentSize = 2;
+            }
+
+            batch.push(row);
+            currentSize += rowSize;
+        }
+
+        if (batch.length > 0) {
+            await postUpsertRows(table, batch);
         }
     }
 
