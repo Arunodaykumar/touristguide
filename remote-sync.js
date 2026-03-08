@@ -1,6 +1,6 @@
 (function () {
     const SYNC_KEYS = ['destinations', 'allUsers', 'bookings', 'deletedDefaultDestinations'];
-    const SETTINGS_KEYS = ['siteLogo', 'siteName', 'contactEmail', 'supportEmail', 'currency', 'taxRate', 'lastUpdated'];
+    const SETTINGS_KEYS = ['siteLogo', 'siteName', 'contactEmail', 'supportEmail', 'contactPhone', 'contactAddress', 'currency', 'taxRate', 'lastUpdated'];
     const SUPABASE_URL =
         localStorage.getItem('SUPABASE_URL') ||
         'https://ghidvuoipfndpfqyhidz.supabase.co';

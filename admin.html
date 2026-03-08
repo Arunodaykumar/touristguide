@@ -454,9 +454,9 @@
                     <button onclick="saveSettings()" style="background:#667eea; color:white; border:none; padding:12px 30px; border-radius:8px; cursor:pointer; font-size:16px; font-weight:600;"><i class="fas fa-save"></i> Save Settings</button>
                 </div>
                 
-                <!-- Email Configuration -->
+                <!-- Contact Configuration -->
                 <div style="padding:30px; background:white; border-radius:10px; margin:20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                    <h3 style="margin-bottom:20px; color:#333;"><i class="fas fa-envelope"></i> Email Configuration</h3>
+                    <h3 style="margin-bottom:20px; color:#333;"><i class="fas fa-address-book"></i> Contact Configuration</h3>
                     <div style="margin-bottom:15px;">
                         <label style="display:block; margin-bottom:8px; font-weight:600;">Contact Email:</label>
                         <input type="email" id="contact-email" value="info@touristguide.com" style="width:100%; max-width:400px; padding:10px; border:2px solid #e1e5e9; border-radius:8px;">
@@ -465,7 +465,15 @@
                         <label style="display:block; margin-bottom:8px; font-weight:600;">Support Email:</label>
                         <input type="email" id="support-email" value="support@touristguide.com" style="width:100%; max-width:400px; padding:10px; border:2px solid #e1e5e9; border-radius:8px;">
                     </div>
-                    <button onclick="saveEmailSettings()" style="background:#27ae60; color:white; border:none; padding:12px 30px; border-radius:8px; cursor:pointer; font-size:16px; font-weight:600;"><i class="fas fa-save"></i> Save Email Settings</button>
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block; margin-bottom:8px; font-weight:600;">Contact Phone:</label>
+                        <input type="text" id="contact-phone" value="+91 9876543210" style="width:100%; max-width:400px; padding:10px; border:2px solid #e1e5e9; border-radius:8px;">
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block; margin-bottom:8px; font-weight:600;">Office Address:</label>
+                        <input type="text" id="contact-address" value="New Delhi, India" style="width:100%; max-width:400px; padding:10px; border:2px solid #e1e5e9; border-radius:8px;">
+                    </div>
+                    <button onclick="saveEmailSettings()" style="background:#27ae60; color:white; border:none; padding:12px 30px; border-radius:8px; cursor:pointer; font-size:16px; font-weight:600;"><i class="fas fa-save"></i> Save Contact Settings</button>
                 </div>
                 
                 <!-- Payment Configuration -->
@@ -707,11 +715,19 @@
             // Load email settings
             const contactEmail = localStorage.getItem('contactEmail');
             const supportEmail = localStorage.getItem('supportEmail');
+            const contactPhone = localStorage.getItem('contactPhone');
+            const contactAddress = localStorage.getItem('contactAddress');
             if (contactEmail && document.getElementById('contact-email')) {
                 document.getElementById('contact-email').value = contactEmail;
             }
             if (supportEmail && document.getElementById('support-email')) {
                 document.getElementById('support-email').value = supportEmail;
+            }
+            if (contactPhone && document.getElementById('contact-phone')) {
+                document.getElementById('contact-phone').value = contactPhone;
+            }
+            if (contactAddress && document.getElementById('contact-address')) {
+                document.getElementById('contact-address').value = contactAddress;
             }
             
             // Load payment settings
@@ -1160,11 +1176,15 @@
         function saveEmailSettings() {
             const contactEmail = document.getElementById('contact-email').value;
             const supportEmail = document.getElementById('support-email').value;
+            const contactPhone = document.getElementById('contact-phone').value;
+            const contactAddress = document.getElementById('contact-address').value;
             localStorage.setItem('contactEmail', contactEmail);
             localStorage.setItem('supportEmail', supportEmail);
+            localStorage.setItem('contactPhone', contactPhone);
+            localStorage.setItem('contactAddress', contactAddress);
             localStorage.setItem('lastUpdated', new Date().toLocaleString());
             window.dispatchEvent(new CustomEvent('settingsUpdated'));
-            alert('Email settings saved successfully!');
+            alert('Contact settings saved successfully!');
             updateSystemInfo();
         }
         
@@ -1187,6 +1207,8 @@
                     siteName: localStorage.getItem('siteName'),
                     contactEmail: localStorage.getItem('contactEmail'),
                     supportEmail: localStorage.getItem('supportEmail'),
+                    contactPhone: localStorage.getItem('contactPhone'),
+                    contactAddress: localStorage.getItem('contactAddress'),
                     currency: localStorage.getItem('currency'),
                     taxRate: localStorage.getItem('taxRate')
                 }

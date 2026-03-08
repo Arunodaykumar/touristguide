@@ -80,7 +80,7 @@
                                 </div>
                                 <div>
                                     <h4 style="margin: 0; color: #333;">Email</h4>
-                                    <p style="margin: 5px 0 0 0; color: #666;">info@touristguide.com</p>
+                                    <p id="contact-email-display" style="margin: 5px 0 0 0; color: #666;">info@touristguide.com</p>
                                 </div>
                             </div>
                             <div style="display: flex; align-items: center; gap: 15px;">
@@ -89,7 +89,7 @@
                                 </div>
                                 <div>
                                     <h4 style="margin: 0; color: #333;">Phone</h4>
-                                    <p style="margin: 5px 0 0 0; color: #666;">+91 9876543210</p>
+                                    <p id="contact-phone-display" style="margin: 5px 0 0 0; color: #666;">+91 9876543210</p>
                                 </div>
                             </div>
                             <div style="display: flex; align-items: center; gap: 15px;">
@@ -98,7 +98,7 @@
                                 </div>
                                 <div>
                                     <h4 style="margin: 0; color: #333;">Address</h4>
-                                    <p style="margin: 5px 0 0 0; color: #666;">New Delhi, India</p>
+                                    <p id="contact-address-display" style="margin: 5px 0 0 0; color: #666;">New Delhi, India</p>
                                 </div>
                             </div>
                         </div>
@@ -133,6 +133,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             refreshAuthUI();
             updateLogoOnPage();
+            updateContactInfoOnPage();
         });
 
         function refreshAuthUI() {
@@ -191,6 +192,30 @@
             alert('Thank you for your message! We will get back to you soon.');
             event.target.reset();
         }
+
+        function updateContactInfoOnPage() {
+            const contactEmail = localStorage.getItem('contactEmail') || 'info@touristguide.com';
+            const supportEmail = localStorage.getItem('supportEmail') || 'support@touristguide.com';
+            const contactPhone = localStorage.getItem('contactPhone') || '+91 9876543210';
+            const contactAddress = localStorage.getItem('contactAddress') || 'New Delhi, India';
+
+            const emailEl = document.getElementById('contact-email-display');
+            const phoneEl = document.getElementById('contact-phone-display');
+            const addressEl = document.getElementById('contact-address-display');
+
+            if (emailEl) emailEl.textContent = contactEmail || supportEmail;
+            if (phoneEl) phoneEl.textContent = contactPhone;
+            if (addressEl) addressEl.textContent = contactAddress;
+        }
+
+        window.addEventListener('storage', function(event) {
+            if (!event.key || ['contactEmail', 'supportEmail', 'contactPhone', 'contactAddress'].includes(event.key)) {
+                updateContactInfoOnPage();
+            }
+        });
+
+        window.addEventListener('settingsUpdated', updateContactInfoOnPage);
+        window.addEventListener('remoteStatePulled', updateContactInfoOnPage);
     </script>
 
     <style>
