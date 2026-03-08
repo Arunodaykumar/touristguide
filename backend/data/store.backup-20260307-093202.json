@@ -1,0 +1,284 @@
+{
+  "stateUpdatedAt": "2026-03-07T03:58:03.530Z",
+  "destinations": [
+    {
+      "id": 1,
+      "name": "Taj Mahal",
+      "country": "India",
+      "category": "cultural",
+      "description": "Iconic white marble mausoleum in Agra",
+      "image": "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=400",
+      "rating": 4.9,
+      "price": 800,
+      "bestTime": "",
+      "imageUrl": "data:image/jpeg;base64,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ZmYAAQBsZmYABgAAAAAAAQAvZmYAAQChmZoABgAAAAAAAQAyAAAAAQBaAAAABgAAAAAAAQA1AAAAAQAtAAAABgAAAAAAAThCSU0D+AAAAAAAcAAA/////////////////////////////wPoAAAAAP////////////////////////////8D6AAAAAD/////////////////////////////A+gAAAAA/////////////////////////////wPoAAA4QklNBAgAAAAAABAAAAABAAACQAAAAkAAAAAAOEJJTQQeAAAAAAAEAAAAADhCSU0EGgAAAAADaQAAAAYAAAAAAAAAAAAAAG4AAACMAAAAGgBkAHMAZgBkAHMAZgBkAHMAZgBzAGQAXwBwAGEAZwBlAC0AMAAwADAAMQAgAGMAbwBwAHkAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAIwAAABuAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAEAAAAAAABudWxsAAAAAgAAAAZib3VuZHNPYmpjAAAAAQAAAAAAAFJjdDEAAAAEAAAAAFRvcCBsb25nAAAAAAAAAABMZWZ0bG9uZwAAAAAAAAAAQnRvbWxvbmcAAABuAAAAAFJnaHRsb25nAAAAjAAAAAZzbGljZXNWbExzAAAAAU9iamMAAAABAAAAAAAFc2xpY2UAAAASAAAAB3NsaWNlSURsb25nAAAAAAAAAAdncm91cElEbG9uZwAAAAAAAAAGb3JpZ2luZW51bQAAAAxFU2xpY2VPcmlnaW4AAAANYXV0b0dlbmVyYXRlZAAAAABUeXBlZW51bQAAAApFU2xpY2VUeXBlAAAAAEltZyAAAAAGYm91bmRzT2JqYwAAAAEAAAAAAABSY3QxAAAABAAAAABUb3AgbG9uZwAAAAAAAAAATGVmdGxvbmcAAAAAAAAAAEJ0b21sb25nAAAAbgAAAABSZ2h0bG9uZwAAAIwAAAADdXJsVEVYVAAAAAEAAAAAAABudWxsVEVYVAAAAAEAAAAAAABNc2dlVEVYVAAAAAEAAAAAAAZhbHRUYWdURVhUAAAAAQAAAAAADmNlbGxUZXh0SXNIVE1MYm9vbAEAAAAIY2VsbFRleHRURVhUAAAAAQAAAAAACWhvcnpB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Pgo8eDp4YXBtZXRhIHhtbG5zOng9J2Fkb2JlOm5zOm1ldGEvJyB4OnhhcHRrPSdYTVAgdG9vbGtpdCAyLjguMi0zMywgZnJhbWV3b3JrIDEuNSc+CjxyZGY6UkRGIHhtbG5zOnJkZj0naHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIycgeG1sbnM6aVg9J2h0dHA6Ly9ucy5hZG9iZS5jb20vaVgvMS4wLyc+CgogPHJkZjpEZXNjcmlwdGlvbiBhYm91dD0ndXVpZDpiZjRkNDI0Zi00Yjc4LTExZWYtYmQzNC1jNTIzM2E2ZTMzZTcnCiAgeG1sbnM6eGFwTU09J2h0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8nPgogIDx4YXBNTTpEb2N1bWVudElEPmFkb2JlOmRvY2lkOnBob3Rvc2hvcDpiZjRkNDI0Yi00Yjc4LTExZWYtYmQzNC1jNTIzM2E2ZTMzZTc8L3hhcE1NOkRvY3VtZW50SUQ+CiA8L3JkZjpEZXNjcmlwdGlvbj4KCjwvcmRmOlJERj4KPC94OnhhcG1ldGE+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAg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"
+    },
+    {
+      "id": 2,
+      "name": "Goa Beaches",
+      "country": "India",
+      "category": "beach",
+      "description": "Beautiful beaches and Portuguese heritage",
+      "image": "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=400",
+      "rating": 4.7,
+      "price": 600
+    },
+    {
+      "id": 3,
+      "name": "Kerala Backwaters",
+      "country": "India",
+      "category": "beach",
+      "description": "Serene backwaters and houseboat cruises",
+      "image": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=400",
+      "rating": 4.8,
+      "price": 700
+    },
+    {
+      "id": 4,
+      "name": "Rajasthan Palaces",
+      "country": "India",
+      "category": "cultural",
+      "description": "Magnificent palaces and desert landscapes",
+      "image": "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=400",
+      "rating": 4.8,
+      "price": 900
+    },
+    {
+      "id": 5,
+      "name": "Himachal Pradesh",
+      "country": "India",
+      "category": "mountain",
+      "description": "Snow-capped mountains and hill stations",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400",
+      "rating": 4.9,
+      "price": 1000
+    },
+    {
+      "id": 6,
+      "name": "Golden Temple",
+      "country": "India",
+      "category": "cultural",
+      "description": "Sacred Sikh temple in Amritsar",
+      "image": "https://images.unsplash.com/photo-1595815771614-ade9d652a65d?w=400",
+      "rating": 4.9,
+      "price": 500
+    },
+    {
+      "id": 7,
+      "name": "Varanasi Ghats",
+      "country": "India",
+      "category": "cultural",
+      "description": "Ancient spiritual city on River Ganges",
+      "image": "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=400",
+      "rating": 4.6,
+      "price": 400
+    },
+    {
+      "id": 8,
+      "name": "Mumbai City",
+      "country": "India",
+      "category": "city",
+      "description": "Bollywood capital and financial hub",
+      "image": "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=400",
+      "rating": 4.5,
+      "price": 800
+    },
+    {
+      "id": 9,
+      "name": "Ladakh",
+      "country": "India",
+      "category": "mountain",
+      "description": "High altitude desert and Buddhist monasteries",
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400",
+      "rating": 4.9,
+      "price": 1200
+    },
+    {
+      "id": 10,
+      "name": "Andaman Islands",
+      "country": "India",
+      "category": "beach",
+      "description": "Pristine beaches and coral reefs",
+      "image": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400",
+      "rating": 4.8,
+      "price": 1100
+    },
+    {
+      "id": 11,
+      "name": "Khajuraho Temples",
+      "country": "India",
+      "category": "cultural",
+      "description": "Ancient temples with intricate sculptures",
+      "image": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=400",
+      "rating": 4.7,
+      "price": 600
+    },
+    {
+      "id": 12,
+      "name": "Darjeeling",
+      "country": "India",
+      "category": "mountain",
+      "description": "Tea gardens and Himalayan views",
+      "image": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400",
+      "rating": 4.6,
+      "price": 700
+    },
+    {
+      "id": 13,
+      "name": "Mysore Palace",
+      "country": "India",
+      "category": "cultural",
+      "description": "Royal palace with Indo-Saracenic architecture",
+      "image": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=400",
+      "rating": 4.7,
+      "price": 500
+    },
+    {
+      "id": 14,
+      "name": "Rishikesh",
+      "country": "India",
+      "category": "cultural",
+      "description": "Yoga capital and adventure sports hub",
+      "image": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400",
+      "rating": 4.8,
+      "price": 600
+    },
+    {
+      "id": 15,
+      "name": "Hampi Ruins",
+      "country": "India",
+      "category": "cultural",
+      "description": "Ancient Vijayanagara Empire ruins",
+      "image": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=400",
+      "rating": 4.6,
+      "price": 550
+    },
+    {
+      "id": 16,
+      "name": "Ooty Hill Station",
+      "country": "India",
+      "category": "mountain",
+      "description": "Queen of hill stations with tea gardens",
+      "image": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400",
+      "rating": 4.5,
+      "price": 650
+    },
+    {
+      "id": 17,
+      "name": "Ajanta Ellora Caves",
+      "country": "India",
+      "category": "cultural",
+      "description": "Ancient Buddhist and Hindu cave temples",
+      "image": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=400",
+      "rating": 4.8,
+      "price": 600
+    },
+    {
+      "id": 18,
+      "name": "Sundarbans",
+      "country": "India",
+      "category": "cultural",
+      "description": "Mangrove forests and Royal Bengal Tigers",
+      "image": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400",
+      "rating": 4.7,
+      "price": 900
+    },
+    {
+      "id": 19,
+      "name": "Coorg Coffee Plantations",
+      "country": "India",
+      "category": "mountain",
+      "description": "Coffee estates and misty hills",
+      "image": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400",
+      "rating": 4.6,
+      "price": 700
+    },
+    {
+      "id": 20,
+      "name": "Pushkar",
+      "country": "India",
+      "category": "cultural",
+      "description": "Holy city with sacred lake and camel fair",
+      "image": "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=400",
+      "rating": 4.5,
+      "price": 500
+    },
+    {
+      "id": 1772855359600,
+      "name": "ranchi",
+      "country": "india",
+      "category": "city",
+      "rating": 4.5,
+      "description": "",
+      "bestTime": "",
+      "price": 0,
+      "imageUrl": "https://images.unsplash.com/photo-1595658658481-d53d3f999875?w=400"
+    }
+  ],
+  "guides": [
+    {
+      "id": 1,
+      "name": "Ramesh Kumar",
+      "location": "Agra",
+      "expertise": "Taj Mahal Tours",
+      "bio": "Expert guide for Taj Mahal and Agra Fort with 15 years experience",
+      "rating": 4.9,
+      "price_per_day": 150
+    },
+    {
+      "id": 2,
+      "name": "Priya Singh",
+      "location": "Jaipur",
+      "expertise": "Rajasthan Culture",
+      "bio": "Specialist in Rajasthani palaces and cultural heritage",
+      "rating": 4.8,
+      "price_per_day": 140
+    },
+    {
+      "id": 3,
+      "name": "Anu Menon",
+      "location": "Kerala",
+      "expertise": "Backwater Tours",
+      "bio": "Local expert in Kerala backwaters and spice plantations",
+      "rating": 4.9,
+      "price_per_day": 130
+    },
+    {
+      "id": 4,
+      "name": "Vikram Sharma",
+      "location": "Himachal Pradesh",
+      "expertise": "Mountain Trekking",
+      "bio": "Professional mountain guide and adventure specialist",
+      "rating": 4.7,
+      "price_per_day": 160
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "Admin",
+      "email": "admin@touristguide.com",
+      "password": "$2a$10$RRYeLzZzr7nINWlJ66YZL.DhW3CYh4MdEsJUPDNiOvvyTG/dt24v2",
+      "role": "admin"
+    }
+  ],
+  "bookings": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "guide_id": 1,
+      "destination_id": 1,
+      "booking_date": "2024-02-15",
+      "status": "confirmed",
+      "user_name": "Rajesh Gupta",
+      "guide_name": "Ramesh Kumar",
+      "destination_name": "Taj Mahal"
+    }
+  ],
+  "nextId": {
+    "destinations": 1772855359601,
+    "guides": 5,
+    "users": 2,
+    "bookings": 2
+  }
+}

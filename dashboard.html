@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Tourist Guide</title>
+    <link rel="stylesheet" href="styles-new.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>TouristGuide</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="destinations.html" class="nav-link">Destinations</a></li>
+                <li><a href="guides.html" class="nav-link">Guides</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+                <li><a href="admin.html" class="nav-link admin-link"><i class="fas fa-shield-alt"></i> Admin</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button onclick="userManager.showLogin()" class="btn-login">Login</button>
+                <button onclick="userManager.showRegister()" class="btn-register">Register</button>
+            </div>
+        </div>
+    </nav>
+
+    <section style="padding: 120px 0 80px; background: #f8f9fa; min-height: 100vh;">
+        <div class="container">
+            <div id="dashboard-content">
+                <!-- Dashboard content will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <script src="remote-sync.js?v=4"></script>
+    <script src="user-manager.js"></script>
+    <script src="logo-global.js"></script>
+    <script>
+        function safeParseJSON(key, fallback) {
+            try {
+                const value = localStorage.getItem(key);
+                return value ? JSON.parse(value) : fallback;
+            } catch (error) {
+                console.warn(`Invalid localStorage JSON for ${key}`, error);
+                return fallback;
+            }
+        }
+
+        function resolveCurrentUser() {
+            const currentUser = safeParseJSON('currentUser', null);
+            if (currentUser) return currentUser;
+
+            const activeUserId = localStorage.getItem('activeUserId');
+            if (!activeUserId) return null;
+
+            const allUsers = safeParseJSON('allUsers', []);
+            const recoveredUser = allUsers.find(u => String(u.id) === String(activeUserId)) || null;
+            if (recoveredUser) {
+                localStorage.setItem('currentUser', JSON.stringify(recoveredUser));
+            }
+            return recoveredUser;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLogoOnPage();
+            syncNavbarAuthState();
+            loadDashboard();
+        });
+
+        function renderNavbarAuth(currentUser) {
+            const authButtons = document.querySelector('.auth-buttons');
+            if (!authButtons) return;
+
+            if (currentUser) {
+                const notifications = currentUser.notifications || [];
+                const unreadCount = notifications.filter(n => !n.read).length;
+                const notificationBadge = unreadCount > 0 ? `<span class="notification-badge">${unreadCount}</span>` : '';
+
+                authButtons.innerHTML = `
+                    <div class="user-menu">
+                        <button onclick="userManager.showNotifications()" class="btn-notifications">
+                            <i class="fas fa-bell"></i>${notificationBadge}
+                        </button>
+                        <button onclick="userManager.showMessages()" class="btn-messages">
+                            <i class="fas fa-envelope"></i>
+                        </button>
+                        <a href="dashboard.html" class="btn-dashboard-link">Dashboard</a>
+                        <span>Welcome, ${currentUser.name}</span>
+                        <button onclick="userManager.logout()" class="btn-logout">Logout</button>
+                    </div>
+                `;
+            } else {
+                authButtons.innerHTML = `
+                    <button onclick="userManager.showLogin()" class="btn-login">Login</button>
+                    <button onclick="userManager.showRegister()" class="btn-register">Register</button>
+                `;
+            }
+        }
+
+        function syncNavbarAuthState() {
+            const currentUser = resolveCurrentUser();
+            renderNavbarAuth(currentUser);
+
+            if (typeof userManager !== 'undefined') {
+                userManager.currentUser = currentUser || null;
+            }
+        }
+
+        function loadDashboard() {
+            const currentUser = resolveCurrentUser();
+            const dashboardContent = document.getElementById('dashboard-content');
+            
+            if (!currentUser) {
+                dashboardContent.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <i class="fas fa-lock" style="font-size: 4rem; color: #ddd; margin-bottom: 20px;"></i>
+                        <h2>Access Denied</h2>
+                        <p>Please login to access your dashboard</p>
+                        <button onclick="window.location.href='index.html'" class="btn-primary" style="margin-top: 20px;">
+                            Go to Home
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Get fresh data from allUsers
+            const allUsers = safeParseJSON('allUsers', []);
+            const freshUserData = allUsers.find(u => String(u.id) === String(currentUser.id));
+            
+            // Use fresh data if available, otherwise use current user data
+            const userData = freshUserData || currentUser;
+            
+            // Debug logging
+            console.log('Current user:', currentUser);
+            console.log('Fresh user data:', freshUserData);
+            console.log('Final user data:', userData);
+            console.log('Bookings:', userData.bookings);
+            
+            // Update localStorage and navbar with fresh data
+            if (freshUserData) {
+                localStorage.setItem('currentUser', JSON.stringify(freshUserData));
+                if (typeof userManager !== 'undefined') {
+                    userManager.currentUser = freshUserData;
+                }
+            }
+            syncNavbarAuthState();
+
+            const updatedCurrentUser = userData;
+            const directBookings = userData.bookings || [];
+            const inferredGuideBookings = userData.role === 'guide'
+                ? allUsers
+                    .flatMap(user => user.bookings || [])
+                    .filter(booking =>
+                        String(booking.guideId) === String(userData.id) ||
+                        (booking.guide && booking.guide.toLowerCase() === String(userData.name || '').toLowerCase())
+                    )
+                : [];
+
+            // Merge direct + inferred bookings and remove duplicates by booking id
+            const bookingMap = new Map();
+            [...directBookings, ...inferredGuideBookings].forEach(booking => {
+                if (booking && booking.id != null) {
+                    bookingMap.set(String(booking.id), booking);
+                }
+            });
+            const bookings = Array.from(bookingMap.values()).sort((a, b) => {
+                const dateA = new Date(a.bookingDate || a.date || 0).getTime();
+                const dateB = new Date(b.bookingDate || b.date || 0).getTime();
+                return dateB - dateA;
+            });
+            const favorites = userData.favorites || [];
+
+            dashboardContent.innerHTML = `
+                <div class="dashboard-header" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 30px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 20px;">
+                            <img src="${updatedCurrentUser.photo || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'}" 
+                                 alt="Profile" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+                            <div>
+                                <h1 style="margin: 0 0 10px 0; color: #333;">Welcome, ${updatedCurrentUser.name}!</h1>
+                                <p style="margin: 0; color: #666; font-size: 1.1rem;">
+                                    ${updatedCurrentUser.role === 'guide' ? '🎯 Tour Guide' : '🧳 Traveler'}
+                                </p>
+                                <p style="margin: 5px 0 0 0; color: #999; font-size: 0.9rem;">
+                                    Member since ${new Date(updatedCurrentUser.joinDate).toLocaleDateString()}
+                                </p>
+                            </div>
+                        </div>
+                        <button onclick="loadDashboard()" class="btn-secondary" style="padding: 10px 20px;">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button onclick="addTestBooking()" class="btn-primary" style="padding: 10px 20px; margin-left: 10px;">
+                            <i class="fas fa-plus"></i> Test Booking
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dashboard-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <div class="stat-card" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); text-align: center;">
+                        <i class="fas fa-calendar-check" style="font-size: 2.5rem; color: #667eea; margin-bottom: 15px;"></i>
+                        <h3 style="margin: 0; font-size: 2rem; color: #333;">${bookings.length}</h3>
+                        <p style="margin: 5px 0 0 0; color: #666;">Total Bookings</p>
+                    </div>
+                    <div class="stat-card" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); text-align: center;">
+                        <i class="fas fa-heart" style="font-size: 2.5rem; color: #ff6b6b; margin-bottom: 15px;"></i>
+                        <h3 style="margin: 0; font-size: 2rem; color: #333;">${favorites.length}</h3>
+                        <p style="margin: 5px 0 0 0; color: #666;">Favorites</p>
+                    </div>
+                    ${userData.role === 'guide' ? `
+                    <div class="stat-card" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); text-align: center;">
+                        <i class="fas fa-star" style="font-size: 2.5rem; color: #ffd700; margin-bottom: 15px;"></i>
+                        <h3 style="margin: 0; font-size: 2rem; color: #333;">${userData.rating || '4.5'}</h3>
+                        <p style="margin: 5px 0 0 0; color: #666;">Rating</p>
+                    </div>` : ''}
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+                    <div class="bookings-section" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+                        <h2 style="margin: 0 0 20px 0; color: #333;">Recent Bookings</h2>
+                        ${bookings.length > 0 ? bookings.slice(0, 5).map(booking => `
+                            <div class="booking-item" style="padding: 20px; border: 1px solid #eee; border-radius: 10px; margin-bottom: 15px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <h4 style="margin: 0 0 5px 0; color: #333;">${booking.destination || booking.guide}</h4>
+                                        <p style="margin: 0; color: #666; font-size: 0.9rem;">
+                                            <i class="fas fa-calendar"></i> ${booking.date} | 
+                                            <i class="fas fa-users"></i> ${booking.people} people |
+                                            <i class="fas fa-rupee-sign"></i> ${booking.amount}
+                                        </p>
+                                        ${userData.role === 'guide' ? `
+                                            <p style="margin: 5px 0 0 0; color: #888; font-size: 0.85rem;">
+                                                <i class="fas fa-user"></i> ${booking.customerName || 'Tourist'}
+                                            </p>
+                                        ` : ''}
+                                        <div style="margin-top: 10px;">
+                                            <button onclick="userManager.openBookingChat('${booking.id}')" class="btn-secondary" style="padding: 6px 12px;">
+                                                <i class="fas fa-comments"></i> Chat
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <span class="status-badge" style="background: #d4edda; color: #155724; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">
+                                        ${booking.status}
+                                    </span>
+                                </div>
+                            </div>
+                        `).join('') : '<p style="color: #666; text-align: center; padding: 40px;">No bookings yet</p>'}
+                    </div>
+
+                    <div class="profile-section" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+                        <h2 style="margin: 0 0 20px 0; color: #333;">Profile</h2>
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-envelope" style="color: #667eea; width: 20px;"></i>
+                                <span style="color: #666;">${userData.email}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-phone" style="color: #667eea; width: 20px;"></i>
+                                <span style="color: #666;">${userData.phone}</span>
+                            </div>
+                            ${userData.role === 'guide' ? `
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-map-marker-alt" style="color: #667eea; width: 20px;"></i>
+                                <span style="color: #666;">${userData.destination || userData.location || 'Not specified'}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-star" style="color: #667eea; width: 20px;"></i>
+                                <span style="color: #666;">${userData.expertise || 'General Tours'}</span>
+                            </div>` : ''}
+                        </div>
+                        <button onclick="userManager.showProfile()" class="btn-primary" style="width: 100%; margin-top: 20px;">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.addEventListener('focus', syncNavbarAuthState);
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'currentUser' || event.key === 'allUsers') {
+                syncNavbarAuthState();
+            }
+        });
+        
+        function updateLogoOnPage() {
+            const savedLogo = localStorage.getItem('siteLogo');
+            const savedName = localStorage.getItem('siteName');
+            
+            if (savedLogo) {
+                const logoIcon = document.querySelector('.logo i');
+                if (logoIcon) {
+                    const img = document.createElement('img');
+                    img.src = savedLogo;
+                    img.style.width = '40px';
+                    img.style.height = '40px';
+                    img.style.objectFit = 'contain';
+                    img.style.marginRight = '0.5rem';
+                    logoIcon.parentNode.replaceChild(img, logoIcon);
+                }
+            }
+            
+            if (savedName) {
+                const nameElement = document.querySelector('.logo span');
+                if (nameElement) nameElement.textContent = savedName;
+            }
+        }
+        
+        function addTestBooking() {
+            const currentUser = safeParseJSON('currentUser', null);
+            if (!currentUser) return;
+            
+            const testBooking = {
+                id: Date.now(),
+                type: 'guide',
+                customerName: 'Test Customer',
+                customerId: 'test123',
+                customerEmail: 'test@example.com',
+                customerPhone: '1234567890',
+                date: new Date().toISOString().split('T')[0],
+                hours: 4,
+                people: 2,
+                tourType: 'cultural',
+                amount: 400,
+                status: 'confirmed',
+                bookingDate: new Date().toISOString()
+            };
+            
+            // Add to current user
+            currentUser.bookings = currentUser.bookings || [];
+            currentUser.bookings.push(testBooking);
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Add to allUsers
+            const allUsers = safeParseJSON('allUsers', []);
+            const userIndex = allUsers.findIndex(u => String(u.id) === String(currentUser.id));
+            if (userIndex > -1) {
+                allUsers[userIndex].bookings = allUsers[userIndex].bookings || [];
+                allUsers[userIndex].bookings.push(testBooking);
+                localStorage.setItem('allUsers', JSON.stringify(allUsers));
+            }
+            
+            loadDashboard();
+        }
+    </script>
+
+    <style>
+        @media (max-width: 768px) {
+            .dashboard-stats {
+                grid-template-columns: 1fr 1fr !important;
+            }
+            
+            section > div > div > div:last-child {
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
+            }
+        }
+    </style>
+</body>
+</html>
+
+
+

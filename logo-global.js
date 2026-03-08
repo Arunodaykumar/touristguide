@@ -1,0 +1,34 @@
+// Global logo update function for all pages
+function updateGlobalLogo() {
+    const savedLogo = localStorage.getItem('siteLogo');
+    const savedName = localStorage.getItem('siteName');
+    
+    if (savedLogo) {
+        const logoIcons = document.querySelectorAll('.logo i, .footer-logo i, .admin-header i');
+        logoIcons.forEach(icon => {
+            if (icon && !icon.classList.contains('fa-tachometer-alt')) {
+                const img = document.createElement('img');
+                img.src = savedLogo;
+                img.style.width = '40px';
+                img.style.height = '40px';
+                img.style.objectFit = 'contain';
+                img.style.marginRight = '0.5rem';
+                icon.parentNode.replaceChild(img, icon);
+            }
+        });
+    }
+    
+    if (savedName) {
+        const nameElements = document.querySelectorAll('.logo span, .footer-logo span');
+        nameElements.forEach(el => el.textContent = savedName);
+        
+        // Update admin title
+        const adminTitle = document.querySelector('.admin-header h1');
+        if (adminTitle) {
+            adminTitle.innerHTML = `<i class="fas fa-tachometer-alt"></i> ${savedName} Admin`;
+        }
+    }
+}
+
+// Auto-run on page load
+document.addEventListener('DOMContentLoaded', updateGlobalLogo);

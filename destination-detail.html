@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destination Details - TouristGuide</title>
+    <link rel="stylesheet" href="styles-new.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>TouristGuide</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="destinations.html">Destinations</a></li>
+                <li><a href="guides.html">Guides</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="admin.html" class="admin-link"><i class="fas fa-shield-alt"></i> Admin</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button onclick="userManager.showLogin()" class="btn-login">Login</button>
+                <button onclick="userManager.showRegister()" class="btn-register">Register</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="destination-detail">
+        <div class="container">
+            <div class="destination-hero">
+                <img id="dest-image" src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=800" alt="Goa Beaches" class="hero-image">
+                <div class="hero-overlay">
+                    <h1 id="dest-name">Goa Beaches</h1>
+                    <div class="hero-rating">
+                        <i class="fas fa-star"></i>
+                        <span id="dest-rating">4.7</span>/5
+                    </div>
+                </div>
+            </div>
+
+            <div class="destination-content">
+                <div class="destination-info">
+                    <div class="info-section">
+                        <h2>About This Destination</h2>
+                        <p id="dest-description">Beautiful beaches with Portuguese heritage and vibrant nightlife.</p>
+                    </div>
+
+                    <div class="info-section">
+                        <h3><i class="fas fa-calendar"></i> Best Time to Visit</h3>
+                        <p id="dest-best-time">November to February</p>
+                    </div>
+
+                    <div class="info-section">
+                        <h3><i class="fas fa-map-marker-alt"></i> Location</h3>
+                        <p id="dest-country">India</p>
+                    </div>
+
+                    <div class="info-section">
+                        <h3><i class="fas fa-tag"></i> Category</h3>
+                        <span id="dest-category" class="category-tag">beach</span>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3><i class="fas fa-user-tie"></i> Available Guides</h3>
+                        <div id="available-guides">
+                            <div class="guide-card-small">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face" alt="Sample Guide" class="guide-avatar">
+                                <div class="guide-info">
+                                    <h4>Sample Guide</h4>
+                                    <p><i class="fas fa-star"></i> 4.5 | ₹100/hr</p>
+                                    <p>Cultural Tours</p>
+                                </div>
+                                <button onclick="alert('Please register as a guide to be listed here')" class="btn-book-guide">Book Guide</button>
+                            </div>
+                            <p style="margin-top: 10px; color: #666;">Register as a guide to be listed here</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-sidebar">
+                    <div class="booking-card">
+                        <h3>Book a Guide</h3>
+                        <div class="rating-display">
+                            <i class="fas fa-star"></i>
+                            <span id="sidebar-rating">4.7</span>/5
+                        </div>
+                        <button class="book-now-btn" onclick="bookDestination()">
+                            <i class="fas fa-user-check"></i> Book Guide
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="logo-global.js"></script>
+    <script src="remote-sync.js?v=4"></script>
+    <script src="user-manager.js"></script>
+    <script>
+        let currentDestination = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshAuthUI();
+            updateLogoOnPage();
+            setTimeout(loadDestination, 100);
+        });
+
+        function refreshAuthUI() {
+            if (typeof userManager === 'undefined') return;
+            userManager.currentUser = userManager.getCurrentUser();
+            if (userManager.currentUser) {
+                userManager.updateUIForLoggedInUser();
+            } else {
+                userManager.updateUIForLoggedOutUser();
+            }
+        }
+        
+        function updateLogoOnPage() {
+            const savedLogo = localStorage.getItem('siteLogo');
+            const savedName = localStorage.getItem('siteName');
+            
+            if (savedLogo) {
+                const logoIcon = document.querySelector('.logo i');
+                if (logoIcon) {
+                    const img = document.createElement('img');
+                    img.src = savedLogo;
+                    img.style.width = '40px';
+                    img.style.height = '40px';
+                    img.style.objectFit = 'contain';
+                    img.style.marginRight = '0.5rem';
+                    logoIcon.parentNode.replaceChild(img, logoIcon);
+                }
+            }
+            
+            if (savedName) {
+                const nameElement = document.querySelector('.logo span');
+                if (nameElement) nameElement.textContent = savedName;
+            }
+        }
+
+        function loadDestination() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const rawName = urlParams.get('name') || '';
+            const safeDecode = (value) => {
+                try {
+                    const once = decodeURIComponent(value || '');
+                    try {
+                        return decodeURIComponent(once);
+                    } catch {
+                        return once;
+                    }
+                } catch {
+                    return String(value || '');
+                }
+            };
+            const normalizeName = (value) => String(value || '')
+                .replace(/\+/g, ' ')
+                .trim()
+                .toLowerCase();
+            const destName = safeDecode(rawName);
+            
+            console.log('URL param name:', destName);
+            
+            // Default destination data
+            const defaultDestinations = {
+                "Taj Mahal": { name: "Taj Mahal", description: "Iconic white marble mausoleum", bestTime: "October to March", rating: 4.9, category: "cultural", country: "India", imageUrl: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800" },
+                "Goa Beaches": { name: "Goa Beaches", description: "Beautiful beaches with Portuguese heritage", bestTime: "November to February", rating: 4.7, category: "beach", country: "India", imageUrl: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=800" },
+                "Kerala Backwaters": { name: "Kerala Backwaters", description: "Serene backwaters with houseboat cruises", bestTime: "September to March", rating: 4.8, category: "nature", country: "India", imageUrl: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800" },
+                "Rajasthan Palaces": { name: "Rajasthan Palaces", description: "Magnificent palaces and forts", bestTime: "October to March", rating: 4.8, category: "cultural", country: "India", imageUrl: "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=800" },
+                "Himachal Pradesh": { name: "Himachal Pradesh", description: "Snow-capped mountains and hill stations", bestTime: "March to June", rating: 4.9, category: "mountain", country: "India", imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800" },
+                "Mumbai City": { name: "Mumbai City", description: "Bollywood capital and financial hub", bestTime: "November to February", rating: 4.5, category: "city", country: "India", imageUrl: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800" }
+            };
+
+            const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]')
+                .map(dest => ({
+                    ...dest,
+                    imageUrl: dest.imageUrl || dest.image || defaultDestinations["Taj Mahal"].imageUrl,
+                    country: dest.country || 'India',
+                    bestTime: dest.bestTime || 'Year-round',
+                    rating: dest.rating || 4.5,
+                    category: dest.category || 'general',
+                    description: dest.description || 'Explore this destination with local guides.'
+                }));
+
+            const allDestinations = [
+                ...savedDestinations,
+                ...Object.values(defaultDestinations)
+            ];
+
+            const destination = allDestinations.find(dest =>
+                normalizeName(dest.name) === normalizeName(destName)
+            ) || (destName ? {
+                name: destName,
+                description: 'Explore this destination with local guides.',
+                bestTime: 'Year-round',
+                rating: 4.5,
+                category: 'general',
+                country: 'India',
+                imageUrl: defaultDestinations["Taj Mahal"].imageUrl
+            } : defaultDestinations["Taj Mahal"]);
+            currentDestination = destination;
+            
+            // Update page
+            document.title = destination.name + ' - TouristGuide';
+            document.getElementById('dest-name').textContent = destination.name;
+            document.getElementById('dest-image').src = destination.imageUrl;
+            document.getElementById('dest-rating').textContent = destination.rating;
+            document.getElementById('sidebar-rating').textContent = destination.rating;
+            document.getElementById('dest-description').textContent = destination.description;
+            document.getElementById('dest-best-time').textContent = destination.bestTime;
+            document.getElementById('dest-country').textContent = destination.country;
+            document.getElementById('dest-category').textContent = destination.category;
+            
+            loadAvailableGuides();
+        }
+        
+        function loadAvailableGuides() {
+            const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            const guides = allUsers.filter(user => user.role === 'guide');
+            const container = document.getElementById('available-guides');
+            
+            if (!currentDestination) return;
+            
+            // Filter guides by destination
+            const locationGuides = guides.filter(guide => {
+                const guideDestination = (guide.destination || guide.location || '').toLowerCase();
+                const destName = currentDestination.name.toLowerCase();
+                
+                return guideDestination.includes(destName) || destName.includes(guideDestination);
+            });
+            
+            console.log('Found guides for', currentDestination.name, ':', locationGuides.length);
+            
+            if (locationGuides.length === 0) {
+                container.innerHTML = '<p style="color: #666; padding: 20px; text-align: center;">No guides available for this destination yet. <a href="#" onclick="userManager.showRegister()">Register as a guide</a></p>';
+                return;
+            }
+            
+            container.innerHTML = locationGuides.map(guide => `
+                <div class="guide-card-small" style="display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 10px; background: white;">
+                    <img src="${guide.photo || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face'}" alt="${guide.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0 0 5px 0; color: #333;">${guide.name}</h4>
+                        <p style="margin: 2px 0; font-size: 14px; color: #666;"><i class="fas fa-star" style="color: #f39c12;"></i> ${guide.rating || '4.5'} | ₹${guide.rate || '100'}/hr</p>
+                        <p style="margin: 2px 0; font-size: 13px; color: #888;">${guide.expertise || 'General Tours'}</p>
+                        <small style="color: #999;">📍 ${guide.destination || guide.location}</small>
+                    </div>
+                    <button onclick="bookGuide('${guide.id}')" style="background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">Book</button>
+                </div>
+            `).join('');
+        }
+        
+        function bookGuide(guideId) {
+            if (!userManager.currentUser) {
+                userManager.showLogin();
+                return;
+            }
+            
+            const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            const guide = allUsers.find(u => u.id == guideId);
+            if (!guide) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal(this)">&times;</span>
+                    <h2>Book Guide: ${guide.name}</h2>
+                    <form onsubmit="submitGuideBooking(event, '${guide.id}')">
+                        <div style="margin-bottom: 15px;">
+                            <label>Tour Date:</label>
+                            <input type="date" name="date" required style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label>Duration (hours):</label>
+                            <input type="number" name="hours" min="1" max="12" value="4" required style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label>Group Size:</label>
+                            <input type="number" name="people" min="1" max="15" value="2" required style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <div style="text-align: center; margin: 15px 0;">
+                            <strong>Total: ₹${(guide.rate || 100) * 4}</strong>
+                        </div>
+                        <button type="submit" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">Book Guide</button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function submitGuideBooking(event, guideId) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            const guide = allUsers.find(u => u.id == guideId);
+            if (!guide || !userManager.currentUser) return;
+            const hours = parseInt(formData.get('hours'));
+            const amount = (guide.rate || 100) * hours;
+            
+            const booking = {
+                id: Date.now(),
+                type: 'guide',
+                guide: guide.name,
+                guideId: guideId,
+                customerName: userManager.currentUser.name,
+                customerId: userManager.currentUser.id,
+                customerEmail: userManager.currentUser.email,
+                customerPhone: userManager.currentUser.phone,
+                date: formData.get('date'),
+                hours: hours,
+                people: formData.get('people'),
+                tourType: currentDestination ? currentDestination.name : 'Custom Tour',
+                amount: amount,
+                status: 'confirmed',
+                bookingDate: new Date().toISOString()
+            };
+            
+            userManager.currentUser.bookings = userManager.currentUser.bookings || [];
+            userManager.currentUser.bookings.push(booking);
+            localStorage.setItem('currentUser', JSON.stringify(userManager.currentUser));
+            
+            const customerIndex = allUsers.findIndex(u => String(u.id) === String(userManager.currentUser.id));
+            if (customerIndex !== -1) {
+                allUsers[customerIndex].bookings = allUsers[customerIndex].bookings || [];
+                allUsers[customerIndex].bookings.push(booking);
+            }
+
+            const guideIndex = allUsers.findIndex(u => String(u.id) === String(guideId));
+            if (guideIndex !== -1) {
+                allUsers[guideIndex].bookings = allUsers[guideIndex].bookings || [];
+                allUsers[guideIndex].bookings.push(booking);
+                allUsers[guideIndex].notifications = allUsers[guideIndex].notifications || [];
+                allUsers[guideIndex].notifications.push({
+                    id: Date.now(),
+                    type: 'booking',
+                    title: 'New Booking Received!',
+                    message: `${userManager.currentUser.name} has booked you for ${hours} hours on ${formData.get('date')}`,
+                    bookingId: booking.id,
+                    read: false,
+                    date: new Date().toISOString()
+                });
+
+                const bookingMessage = {
+                    id: Date.now() + 1,
+                    from: userManager.currentUser.id,
+                    fromName: userManager.currentUser.name,
+                    to: guideId,
+                    toName: guide.name,
+                    subject: `New booking #${booking.id} from ${userManager.currentUser.name}`,
+                    message: `${userManager.currentUser.name} booked you for ${hours} hour(s) on ${formData.get('date')} for ${formData.get('people')} people.`,
+                    bookingId: booking.id,
+                    date: new Date().toISOString(),
+                    read: false
+                };
+                allUsers[guideIndex].messages = allUsers[guideIndex].messages || [];
+                allUsers[guideIndex].messages.push(bookingMessage);
+                userManager.currentUser.sentMessages = userManager.currentUser.sentMessages || [];
+                userManager.currentUser.sentMessages.push(bookingMessage);
+                if (customerIndex !== -1) {
+                    allUsers[customerIndex].sentMessages = allUsers[customerIndex].sentMessages || [];
+                    allUsers[customerIndex].sentMessages.push(bookingMessage);
+                }
+            }
+
+            localStorage.setItem('allUsers', JSON.stringify(allUsers));
+            localStorage.setItem('currentUser', JSON.stringify(userManager.currentUser));
+            
+            closeModal(event.target);
+            showNotification('Guide booked successfully!', 'success');
+            setTimeout(() => {
+                if (confirm('Would you like to send a message to your guide?')) {
+                    showMessagingModal(guideId, booking.id);
+                }
+            }, 300);
+        }
+
+        function showMessagingModal(guideId, bookingId) {
+            const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            const guide = allUsers.find(u => u.id == guideId);
+            if (!guide) return;
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal(this)">&times;</span>
+                    <h2><i class="fas fa-comments"></i> Message ${guide.name}</h2>
+                    <form onsubmit="sendMessageToGuide(event, '${guideId}', '${bookingId}')">
+                        <div style="margin-bottom: 15px;">
+                            <label>Subject</label>
+                            <input type="text" name="subject" value="Regarding booking #${bookingId}" required style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label>Message</label>
+                            <textarea name="message" rows="4" placeholder="Hi ${guide.name}, I have booked you for a tour. Looking forward to it!" required style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+                        </div>
+                        <button type="submit" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            <i class="fas fa-paper-plane"></i> Send Message
+                        </button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function sendMessageToGuide(event, guideId, bookingId) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            const guideIndex = allUsers.findIndex(u => String(u.id) === String(guideId));
+            if (guideIndex === -1 || !userManager.currentUser) return;
+
+            const message = {
+                id: Date.now(),
+                from: userManager.currentUser.id,
+                fromName: userManager.currentUser.name,
+                to: guideId,
+                toName: allUsers[guideIndex].name,
+                subject: formData.get('subject'),
+                message: formData.get('message'),
+                bookingId: bookingId,
+                date: new Date().toISOString(),
+                read: false
+            };
+
+            allUsers[guideIndex].messages = allUsers[guideIndex].messages || [];
+            allUsers[guideIndex].messages.push(message);
+            allUsers[guideIndex].notifications = allUsers[guideIndex].notifications || [];
+            allUsers[guideIndex].notifications.push({
+                id: Date.now() + 1,
+                type: 'message',
+                title: 'New Message',
+                message: `${userManager.currentUser.name} sent you a message about booking #${bookingId}.`,
+                bookingId: bookingId,
+                read: false,
+                date: new Date().toISOString()
+            });
+
+            userManager.currentUser.sentMessages = userManager.currentUser.sentMessages || [];
+            userManager.currentUser.sentMessages.push(message);
+            const customerIndex = allUsers.findIndex(u => String(u.id) === String(userManager.currentUser.id));
+            if (customerIndex !== -1) {
+                allUsers[customerIndex].sentMessages = allUsers[customerIndex].sentMessages || [];
+                allUsers[customerIndex].sentMessages.push(message);
+            }
+
+            localStorage.setItem('allUsers', JSON.stringify(allUsers));
+            localStorage.setItem('currentUser', JSON.stringify(userManager.currentUser));
+            closeModal(event.target);
+            showNotification('Message sent to guide successfully!', 'success');
+        }
+        
+        function bookDestination() {
+            if (!userManager.currentUser) {
+                userManager.showLogin();
+                return;
+            }
+            
+            if (!currentDestination) return;
+            localStorage.setItem('selectedDestinationForGuideBooking', currentDestination.name || '');
+            showNotification('Destination booking disabled. Please choose a guide below.', 'info');
+            const guidesSection = document.getElementById('available-guides');
+            if (guidesSection) {
+                guidesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        function closeModal(element) {
+            const modal = element.closest('.modal-backdrop');
+            if (modal) modal.remove();
+        }
+    </script>
+</body>
+</html>
+
+
+

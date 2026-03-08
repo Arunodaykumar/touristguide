@@ -1,0 +1,4 @@
+com\touristguide\service\DestinationService.class
+com\touristguide\TouristGuideApplication.class
+com\touristguide\controller\DestinationController.class
+com\touristguide\model\Destination.class
