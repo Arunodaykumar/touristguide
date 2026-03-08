@@ -210,6 +210,14 @@
             if (destination.imageUrl) {
                 destImage.src = destination.imageUrl;
                 destImage.style.display = 'block';
+                // Data URLs are usually lower resolution after compression; contain keeps them cleaner.
+                if (String(destination.imageUrl).startsWith('data:')) {
+                    destImage.style.objectFit = 'contain';
+                    destImage.style.background = '#0f172a';
+                } else {
+                    destImage.style.objectFit = 'cover';
+                    destImage.style.background = 'transparent';
+                }
             } else {
                 destImage.removeAttribute('src');
                 destImage.style.display = 'none';

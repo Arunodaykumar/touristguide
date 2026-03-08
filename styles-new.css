@@ -2369,20 +2369,27 @@ input[name="cardNumber"]:focus {
 .destination-detail {
     min-height: 100vh;
     background: #f8f9fa;
+    padding-top: 96px;
 }
 
 .destination-hero {
     position: relative;
-    height: 60vh;
-    min-height: 400px;
+    height: 56vh;
+    min-height: 340px;
+    max-height: 620px;
     overflow: hidden;
     border-radius: 0 0 20px 20px;
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .hero-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
 }
 
 .hero-overlay {
@@ -2638,6 +2645,16 @@ input[name="cardNumber"]:focus {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .destination-detail {
+        padding-top: 150px;
+    }
+
+    .destination-hero {
+        height: 42vh;
+        min-height: 250px;
+        max-height: 360px;
+    }
+
     .destination-content {
         grid-template-columns: 1fr;
         gap: 20px;
@@ -2667,6 +2684,15 @@ input[name="cardNumber"]:focus {
 }
 
 @media (max-width: 480px) {
+    .destination-detail {
+        padding-top: 145px;
+    }
+
+    .destination-hero {
+        height: 34vh;
+        min-height: 210px;
+    }
+
     .hero-overlay {
         padding: 20px;
     }
