@@ -1852,8 +1852,20 @@
                 }
             ];
             
-            // Use saved destinations if available, otherwise use fallback
-            const destinationsToShow = savedDestinations.length > 0 ? savedDestinations : fallbackData;
+            // Merge fallback + saved so partial remote payload (e.g. only 1 row) does not hide other cards
+            const normalizeKey = (dest) => String(dest?.id || '').trim() || String(dest?.name || '').trim().toLowerCase();
+            const merged = new Map();
+            fallbackData.forEach(dest => {
+                const key = normalizeKey(dest);
+                merged.set(key, { ...dest });
+            });
+            savedDestinations.forEach(dest => {
+                const key = normalizeKey(dest);
+                if (!key) return;
+                const base = merged.get(key) || {};
+                merged.set(key, { ...base, ...dest });
+            });
+            const destinationsToShow = Array.from(merged.values());
             
             console.log('Destinations to show:', destinationsToShow.length);
             
@@ -2286,7 +2298,19 @@
                 }
             ];
             
-            const allDestinations = savedDestinations.length > 0 ? savedDestinations : fallbackData;
+            const normalizeKey = (dest) => String(dest?.id || '').trim() || String(dest?.name || '').trim().toLowerCase();
+            const merged = new Map();
+            fallbackData.forEach(dest => {
+                const key = normalizeKey(dest);
+                merged.set(key, { ...dest });
+            });
+            savedDestinations.forEach(dest => {
+                const key = normalizeKey(dest);
+                if (!key) return;
+                const base = merged.get(key) || {};
+                merged.set(key, { ...base, ...dest });
+            });
+            const allDestinations = Array.from(merged.values());
             
             if (currentDestinationIndex >= allDestinations.length) {
                 showNotification('All destinations loaded!', 'info');
