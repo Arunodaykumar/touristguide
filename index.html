@@ -1873,9 +1873,10 @@
             ];
             
             // Merge fallback + saved so partial remote payload (e.g. only 1 row) does not hide other cards
+            const fallbackWithoutImages = fallbackData.map(dest => ({ ...dest, imageUrl: '' }));
             const normalizeKey = (dest) => String(dest?.id || '').trim() || String(dest?.name || '').trim().toLowerCase();
             const merged = new Map();
-            fallbackData.forEach(dest => {
+            fallbackWithoutImages.forEach(dest => {
                 const key = normalizeKey(dest);
                 merged.set(key, { ...dest });
             });
@@ -1904,27 +1905,13 @@
                 console.log('About to render destinations:', destinationsToShow.length);
                 
                 container.innerHTML = destinationsToShow.slice(0, 6).map(destination => {
-                    // Get image URL with better fallback logic
-                    let imageUrl = destination.imageUrl || destination.image;
-                    
-                    // If no image URL, provide category-specific fallback
-                    if (!imageUrl || imageUrl.trim() === '') {
-                        const categoryImages = {
-                            'cultural': 'https://images.unsplash.com/photo-1548013146-72479768bada?w=400',
-                            'beach': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
-                            'nature': 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400',
-                            'mountain': 'https://images.unsplash.com/photo-1605640840605-14ac1855827b?w=400',
-                            'city': 'https://images.unsplash.com/photo-1595658658481-d53d3f999875?w=400',
-                            'adventure': 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400'
-                        };
-                        imageUrl = categoryImages[destination.category] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400';
-                    }
+                    const imageUrl = destination.imageUrl || destination.image || '';
                     
                     console.log(`Rendering ${destination.name} with image: ${imageUrl}`);
                     
                     return `
                         <div class="destination-card" data-category="${destination.category}" onclick="viewDestination('${destination.name}')">
-                            <img src="${imageUrl}" alt="${destination.name}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400'">
+                            ${imageUrl ? `<img src="${imageUrl}" alt="${destination.name}" loading="lazy">` : `<div style="height:220px; display:flex; align-items:center; justify-content:center; background:#eef2f7; color:#6b7280; font-weight:600;">No image added by admin</div>`}
                             <div class="card-content">
                                 <h3>${destination.name}</h3>
                                 <p class="description">${destination.description}</p>
@@ -2318,9 +2305,10 @@
                 }
             ];
             
+            const fallbackWithoutImages = fallbackData.map(dest => ({ ...dest, imageUrl: '' }));
             const normalizeKey = (dest) => String(dest?.id || '').trim() || String(dest?.name || '').trim().toLowerCase();
             const merged = new Map();
-            fallbackData.forEach(dest => {
+            fallbackWithoutImages.forEach(dest => {
                 const key = normalizeKey(dest);
                 merged.set(key, { ...dest });
             });
@@ -2341,28 +2329,14 @@
             const nextBatch = allDestinations.slice(currentDestinationIndex, currentDestinationIndex + 3);
             
             nextBatch.forEach(destination => {
-                // Get image URL with better fallback logic
-                let imageUrl = destination.imageUrl || destination.image;
-                
-                // If no image URL, provide category-specific fallback
-                if (!imageUrl || imageUrl.trim() === '') {
-                    const categoryImages = {
-                        'cultural': 'https://images.unsplash.com/photo-1548013146-72479768bada?w=400',
-                        'beach': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
-                        'nature': 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400',
-                        'mountain': 'https://images.unsplash.com/photo-1605640840605-14ac1855827b?w=400',
-                        'city': 'https://images.unsplash.com/photo-1595658658481-d53d3f999875?w=400',
-                        'adventure': 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400'
-                    };
-                    imageUrl = categoryImages[destination.category] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400';
-                }
+                const imageUrl = destination.imageUrl || destination.image || '';
                 
                 const destinationCard = document.createElement('div');
                 destinationCard.className = 'destination-card';
                 destinationCard.setAttribute('data-category', destination.category);
                 destinationCard.onclick = () => viewDestination(destination.name);
                 destinationCard.innerHTML = `
-                    <img src="${imageUrl}" alt="${destination.name}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400'">
+                    ${imageUrl ? `<img src="${imageUrl}" alt="${destination.name}" loading="lazy">` : `<div style="height:220px; display:flex; align-items:center; justify-content:center; background:#eef2f7; color:#6b7280; font-weight:600;">No image added by admin</div>`}
                     <div class="card-content">
                         <h3>${destination.name}</h3>
                         <p class="description">${destination.description}</p>

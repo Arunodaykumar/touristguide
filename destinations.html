@@ -133,10 +133,9 @@
 
         function loadAllDestinations() {
             const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]');
-            const fallbackImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450'%3E%3Crect width='100%25' height='100%25' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%23475569' font-size='28' font-family='Arial'%3EImage Not Available%3C/text%3E%3C/svg%3E";
             const resolveImage = (dest) => {
                 const img = dest?.imageUrl || dest?.image || dest?.frontImage || '';
-                return (typeof img === 'string' && img.trim()) ? img : fallbackImage;
+                return (typeof img === 'string' && img.trim()) ? img : '';
             };
             const normalizeKey = (dest) => String(dest?.id || '').trim() || String(dest?.name || '').trim().toLowerCase();
             const fallbackData = [
@@ -233,8 +232,9 @@
             ];
 
             // Merge fallback + saved data so partial/broken saved payload does not hide other destinations.
+            const fallbackWithoutImages = fallbackData.map(dest => ({ ...dest, imageUrl: '' }));
             const map = new Map();
-            fallbackData.forEach(dest => {
+            fallbackWithoutImages.forEach(dest => {
                 const key = normalizeKey(dest);
                 map.set(key, { ...dest });
             });
@@ -253,7 +253,7 @@
             
             container.innerHTML = destinations.map(dest => `
                 <div class="destination-card" data-category="${dest.category}" onclick="viewDestination('${encodeURIComponent(dest.name)}')" role="button" tabindex="0" onkeydown="handleDestinationKeydown(event, '${encodeURIComponent(dest.name)}')">
-                    <img src="${resolveImage(dest)}" alt="${dest.name}" loading="lazy" onerror="this.src='${fallbackImage}'">
+                    ${resolveImage(dest) ? `<img src="${resolveImage(dest)}" alt="${dest.name}" loading="lazy">` : `<div style="height:220px; display:flex; align-items:center; justify-content:center; background:#eef2f7; color:#6b7280; font-weight:600;">No image added by admin</div>`}
                     <div class="card-content">
                         <h3>${dest.name}</h3>
                         <p class="description">${dest.description}</p>

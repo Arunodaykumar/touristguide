@@ -31,7 +31,7 @@
     <main class="destination-detail">
         <div class="container">
             <div class="destination-hero">
-                <img id="dest-image" src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=800" alt="Goa Beaches" class="hero-image">
+                <img id="dest-image" src="" alt="Destination Image" class="hero-image">
                 <div class="hero-overlay">
                     <h1 id="dest-name">Goa Beaches</h1>
                     <div class="hero-rating">
@@ -166,18 +166,18 @@
             
             // Default destination data
             const defaultDestinations = {
-                "Taj Mahal": { name: "Taj Mahal", description: "Iconic white marble mausoleum", bestTime: "October to March", rating: 4.9, category: "cultural", country: "India", imageUrl: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800" },
-                "Goa Beaches": { name: "Goa Beaches", description: "Beautiful beaches with Portuguese heritage", bestTime: "November to February", rating: 4.7, category: "beach", country: "India", imageUrl: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=800" },
-                "Kerala Backwaters": { name: "Kerala Backwaters", description: "Serene backwaters with houseboat cruises", bestTime: "September to March", rating: 4.8, category: "nature", country: "India", imageUrl: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800" },
-                "Rajasthan Palaces": { name: "Rajasthan Palaces", description: "Magnificent palaces and forts", bestTime: "October to March", rating: 4.8, category: "cultural", country: "India", imageUrl: "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=800" },
-                "Himachal Pradesh": { name: "Himachal Pradesh", description: "Snow-capped mountains and hill stations", bestTime: "March to June", rating: 4.9, category: "mountain", country: "India", imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800" },
-                "Mumbai City": { name: "Mumbai City", description: "Bollywood capital and financial hub", bestTime: "November to February", rating: 4.5, category: "city", country: "India", imageUrl: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800" }
+                "Taj Mahal": { name: "Taj Mahal", description: "Iconic white marble mausoleum", bestTime: "October to March", rating: 4.9, category: "cultural", country: "India", imageUrl: "" },
+                "Goa Beaches": { name: "Goa Beaches", description: "Beautiful beaches with Portuguese heritage", bestTime: "November to February", rating: 4.7, category: "beach", country: "India", imageUrl: "" },
+                "Kerala Backwaters": { name: "Kerala Backwaters", description: "Serene backwaters with houseboat cruises", bestTime: "September to March", rating: 4.8, category: "nature", country: "India", imageUrl: "" },
+                "Rajasthan Palaces": { name: "Rajasthan Palaces", description: "Magnificent palaces and forts", bestTime: "October to March", rating: 4.8, category: "cultural", country: "India", imageUrl: "" },
+                "Himachal Pradesh": { name: "Himachal Pradesh", description: "Snow-capped mountains and hill stations", bestTime: "March to June", rating: 4.9, category: "mountain", country: "India", imageUrl: "" },
+                "Mumbai City": { name: "Mumbai City", description: "Bollywood capital and financial hub", bestTime: "November to February", rating: 4.5, category: "city", country: "India", imageUrl: "" }
             };
 
             const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]')
                 .map(dest => ({
                     ...dest,
-                    imageUrl: dest.imageUrl || dest.image || defaultDestinations["Taj Mahal"].imageUrl,
+                    imageUrl: dest.imageUrl || dest.image || '',
                     country: dest.country || 'India',
                     bestTime: dest.bestTime || 'Year-round',
                     rating: dest.rating || 4.5,
@@ -199,14 +199,21 @@
                 rating: 4.5,
                 category: 'general',
                 country: 'India',
-                imageUrl: defaultDestinations["Taj Mahal"].imageUrl
+                imageUrl: ''
             } : defaultDestinations["Taj Mahal"]);
             currentDestination = destination;
             
             // Update page
             document.title = destination.name + ' - TouristGuide';
             document.getElementById('dest-name').textContent = destination.name;
-            document.getElementById('dest-image').src = destination.imageUrl;
+            const destImage = document.getElementById('dest-image');
+            if (destination.imageUrl) {
+                destImage.src = destination.imageUrl;
+                destImage.style.display = 'block';
+            } else {
+                destImage.removeAttribute('src');
+                destImage.style.display = 'none';
+            }
             document.getElementById('dest-rating').textContent = destination.rating;
             document.getElementById('sidebar-rating').textContent = destination.rating;
             document.getElementById('dest-description').textContent = destination.description;

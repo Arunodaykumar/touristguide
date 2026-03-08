@@ -264,7 +264,7 @@
         try {
             const payload = getLocalState();
             const destinations = Array.isArray(payload.destinations)
-                ? payload.destinations.map((d) => pruneLargeStrings(mapDestinationForDb(d)))
+                ? payload.destinations.map((d) => pruneLargeStrings(mapDestinationForDb(d), 500000))
                 : [];
             const users = Array.isArray(payload.allUsers)
                 ? payload.allUsers.map((u) => pruneLargeStrings(mapUserForDb(u)))

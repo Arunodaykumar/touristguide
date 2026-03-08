@@ -838,6 +838,8 @@
                 return;
             }
             
+            const imageUrlInput = prompt('Image URL (optional):') || '';
+
             const newDest = {
                 id: Date.now(),
                 name: name.trim(),
@@ -847,17 +849,7 @@
                 description: '',
                 bestTime: '',
                 price: 0,
-                imageUrl: (() => {
-                    const categoryImages = {
-                        'cultural': 'https://images.unsplash.com/photo-1548013146-72479768bada?w=400',
-                        'beach': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
-                        'nature': 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400',
-                        'mountain': 'https://images.unsplash.com/photo-1605640840605-14ac1855827b?w=400',
-                        'city': 'https://images.unsplash.com/photo-1595658658481-d53d3f999875?w=400',
-                        'adventure': 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400'
-                    };
-                    return categoryImages[category.toLowerCase().trim()] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400';
-                })()
+                imageUrl: imageUrlInput.trim()
             };
             
             const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]');
@@ -888,8 +880,9 @@
                 newValue: JSON.stringify(savedDestinations)
             }));
             
-            alert('Destination "' + name + '" added successfully!');
+            alert('Destination "' + name + '" added successfully! Ab image/details ke liye edit form open hoga.');
             loadData();
+            editDestination(encodeURIComponent(newDest.name));
         }
         
         let currentEditingDest = null;
@@ -958,7 +951,7 @@
             }
         }
 
-        function compressImageFile(file, maxWidth = 1280, quality = 0.72) {
+        function compressImageFile(file, maxWidth = 900, quality = 0.65) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -1041,16 +1034,7 @@
                     if (imageUrl) {
                         currentEditingDest.imageUrl = imageUrl;
                     } else if (!currentEditingDest.imageUrl) {
-                        // Set default image based on category if no image provided
-                        const categoryImages = {
-                            'cultural': 'https://images.unsplash.com/photo-1548013146-72479768bada?w=400',
-                            'beach': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
-                            'nature': 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400',
-                            'mountain': 'https://images.unsplash.com/photo-1605640840605-14ac1855827b?w=400',
-                            'city': 'https://images.unsplash.com/photo-1595658658481-d53d3f999875?w=400',
-                            'adventure': 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400'
-                        };
-                        currentEditingDest.imageUrl = categoryImages[currentEditingDest.category] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400';
+                        currentEditingDest.imageUrl = '';
                     }
                     
                     // Save to localStorage
