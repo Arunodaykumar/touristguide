@@ -75,6 +75,7 @@
             loadAllDestinations();
             setupFilters();
             handleURLParameters();
+            window.addEventListener('remoteStatePulled', loadAllDestinations);
         });
 
         function refreshAuthUI() {
@@ -165,6 +166,69 @@
                     rating: 4.8,
                     category: "nature",
                     imageUrl: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400"
+                },
+                {
+                    id: 4,
+                    name: "Rajasthan Palaces",
+                    description: "Magnificent palaces and forts showcasing royal heritage.",
+                    bestTime: "October to March",
+                    rating: 4.8,
+                    category: "cultural",
+                    imageUrl: "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=400"
+                },
+                {
+                    id: 5,
+                    name: "Himachal Pradesh",
+                    description: "Snow-capped mountains and scenic hill stations.",
+                    bestTime: "March to June, September to November",
+                    rating: 4.9,
+                    category: "mountain",
+                    imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400"
+                },
+                {
+                    id: 6,
+                    name: "Golden Temple",
+                    description: "Sacred Sikh temple with golden architecture in Amritsar.",
+                    bestTime: "October to March",
+                    rating: 4.9,
+                    category: "cultural",
+                    imageUrl: "https://images.unsplash.com/photo-1595815771614-ade9d652a65d?w=400"
+                },
+                {
+                    id: 7,
+                    name: "Varanasi Ghats",
+                    description: "Ancient spiritual city on the banks of River Ganges.",
+                    bestTime: "October to March",
+                    rating: 4.6,
+                    category: "cultural",
+                    imageUrl: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=400"
+                },
+                {
+                    id: 8,
+                    name: "Mumbai City",
+                    description: "Bollywood capital and financial hub of India.",
+                    bestTime: "November to February",
+                    rating: 4.5,
+                    category: "city",
+                    imageUrl: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=400"
+                },
+                {
+                    id: 9,
+                    name: "Ladakh",
+                    description: "High altitude desert with Buddhist monasteries and stunning landscapes.",
+                    bestTime: "May to September",
+                    rating: 4.9,
+                    category: "mountain",
+                    imageUrl: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400"
+                },
+                {
+                    id: 10,
+                    name: "Andaman Islands",
+                    description: "Pristine beaches with crystal clear waters and coral reefs.",
+                    bestTime: "October to May",
+                    rating: 4.8,
+                    category: "beach",
+                    imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400"
                 }
             ];
 

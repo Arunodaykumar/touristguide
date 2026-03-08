@@ -153,22 +153,16 @@
         };
     }
 
-    async function replaceTable(table, rows) {
-        const deleteRes = await supabaseFetch(`/rest/v1/${table}?id=not.is.null`, { method: 'DELETE' });
-        if (!deleteRes.ok) {
-            const errText = await deleteRes.text();
-            throw new Error(`Delete ${table} failed: ${deleteRes.status} ${errText}`);
-        }
+    async function upsertTable(table, rows) {
         if (!Array.isArray(rows) || rows.length === 0) return;
-
-        const insertRes = await supabaseFetch(`/rest/v1/${table}`, {
+        const insertRes = await supabaseFetch(`/rest/v1/${table}?on_conflict=id`, {
             method: 'POST',
-            headers: { Prefer: 'return=minimal' },
+            headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
             body: JSON.stringify(rows)
         });
         if (!insertRes.ok) {
             const errText = await insertRes.text();
-            throw new Error(`Insert ${table} failed: ${insertRes.status} ${errText}`);
+            throw new Error(`Upsert ${table} failed: ${insertRes.status} ${errText}`);
         }
     }
 
@@ -218,9 +212,9 @@
             const users = Array.isArray(payload.allUsers) ? payload.allUsers.map(mapUserForDb) : [];
             const bookings = Array.isArray(payload.bookings) ? payload.bookings.map(mapBookingForDb) : [];
 
-            await replaceTable('destinations', destinations);
-            await replaceTable('users', users);
-            await replaceTable('bookings', bookings);
+            await upsertTable('destinations', destinations);
+            await upsertTable('users', users);
+            await upsertTable('bookings', bookings);
 
             window.dispatchEvent(new CustomEvent('remoteStatePushed'));
         } catch (error) {
