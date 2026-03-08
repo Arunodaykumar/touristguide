@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Destinations</title>
+</head>
+<body>
+    <h1>Test Destination Population</h1>
+    <select name="destination" id="test-destination">
+        <option value="">Select Destination</option>
+    </select>
+    
+    <button onclick="testPopulate()">Test Populate</button>
+    
+    <script>
+        function testPopulate() {
+            const select = document.getElementById('test-destination');
+            const destinations = [
+                'Taj Mahal', 'Goa Beaches', 'Kerala Backwaters', 'Rajasthan Palaces', 
+                'Himachal Pradesh', 'Mumbai City', 'Golden Temple', 'Varanasi Ghats', 
+                'Ladakh', 'Andaman Islands', 'Jaipur', 'Delhi', 'Agra', 'Udaipur'
+            ];
+            
+            select.innerHTML = '<option value="">Select Destination to Guide</option>';
+            
+            destinations.forEach(destination => {
+                const option = document.createElement('option');
+                option.value = destination;
+                option.textContent = destination;
+                select.appendChild(option);
+            });
+            
+            console.log('Populated', destinations.length, 'destinations');
+        }
+        
+        // Auto populate on load
+        window.onload = testPopulate;
+    </script>
+</body>
+</html>
+

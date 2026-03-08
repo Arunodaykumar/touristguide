@@ -1,0 +1,2382 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourist Guide - Discover Amazing Places</title>
+    <link rel="stylesheet" href="styles-new.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Custom styles from previous project */
+        .brand-gradient {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+        }
+        
+        .destination-card, .guide-card, .testimonial-card, .blog-card {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .destination-card:hover, .guide-card:hover, .testimonial-card:hover, .blog-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 40;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            max-width: 90%;
+            width: 500px;
+            z-index: 50;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .page {
+            animation: pageEnter 0.5s ease-in-out;
+        }
+
+        @keyframes pageEnter {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .tab-btn {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            color: #f97316;
+        }
+
+        .tab-btn.active {
+            color: #f97316;
+            border-bottom-color: #f97316;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(249, 115, 22, 0.3);
+            border-radius: 50%;
+            border-top-color: #f97316;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .admin-link {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white !important;
+            border-radius: 5px;
+            padding: 8px 12px;
+        }
+        
+        .admin-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+            40% { transform: translateY(-10px) translateX(-50%); }
+            60% { transform: translateY(-5px) translateX(-50%); }
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255,107,107,0.4) !important;
+        }
+        
+        .btn-secondary:hover {
+            background: white !important;
+            color: #667eea !important;
+        }
+        
+        .filter-btn:hover {
+            background: linear-gradient(45deg, #667eea, #764ba2) !important;
+            color: white !important;
+            transform: translateY(-2px);
+        }
+        
+        .hero-vibrant {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .hero-overlay-vibrant {
+            background: rgba(0,0,0,0.3);
+        }
+        
+        .hero-content-vibrant {
+            color: white;
+            text-align: center;
+            padding: 100px 20px;
+        }
+        
+        .hero-title-vibrant {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .hero-subtitle-vibrant {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .hero-buttons-vibrant {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-primary-vibrant {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255,107,107,0.3);
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary-vibrant {
+            background: transparent;
+            color: white;
+            padding: 15px 30px;
+            border: 2px solid white;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .scroll-indicator-vibrant {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            animation: bounce 2s infinite;
+        }
+        
+        .scroll-icon-vibrant {
+            font-size: 2rem;
+        }
+        
+        .search-section-vibrant {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            padding: 60px 0;
+        }
+        
+        .search-box-vibrant {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .search-input-vibrant {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 50px;
+            font-size: 16px;
+            margin-right: 15px;
+        }
+        
+        .category-filter-vibrant {
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 50px;
+            font-size: 16px;
+            margin-right: 15px;
+            min-width: 150px;
+        }
+        
+        .search-btn-vibrant {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 18px;
+            box-shadow: 0 8px 25px rgba(102,126,234,0.3);
+        }
+        
+        .destinations-vibrant {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 80px 0;
+        }
+        
+        .section-header-vibrant {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-title-vibrant {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .section-subtitle-vibrant {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+        }
+        
+        .filter-tabs-vibrant {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn-active {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255,107,107,0.3);
+        }
+        
+        .filter-btn-inactive {
+            background: white;
+            color: #333;
+            padding: 12px 25px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .destination-grid-vibrant {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .load-more-vibrant {
+            text-align: center;
+        }
+        
+        .btn-outline-vibrant {
+            background: transparent;
+            color: #667eea;
+            padding: 15px 40px;
+            border: 2px solid #667eea;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .newsletter-vibrant {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 80px 0;
+            color: white;
+        }
+        
+        .newsletter-content-vibrant {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .newsletter-title-vibrant {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+        
+        .newsletter-subtitle-vibrant {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .newsletter-form-vibrant {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .newsletter-input-vibrant {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+        }
+        
+        .newsletter-btn-vibrant {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255,107,107,0.3);
+        }
+        
+        .view-all-guides-center {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .view-all-guides-btn {
+            display: inline-block;
+            background: transparent;
+            color: #667eea;
+            padding: 15px 40px;
+            border: 2px solid #667eea;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <!-- Special Top Bar -->
+    <div id="special-top-bar" class="hidden bg-slate-800 text-slate-100 items-center justify-between px-8 h-12 sticky top-0 z-40">
+        <span id="top-bar-title" class="text-lg font-bold tracking-wider">Tourist Guide</span>
+        <div class="flex items-center gap-4">
+            <a href="admin.html" class="bg-slate-700 text-white font-semibold text-sm px-4 py-1.5 rounded-lg hover:bg-slate-600 transition duration-300 flex items-center gap-2">
+                <i class="fas fa-cog"></i>
+                <span>Admin Panel</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo" id="site-logo">
+                <i class="fas fa-map-marked-alt"></i>
+                <span id="site-name">TouristGuide</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="destinations.html" class="nav-link">Destinations</a></li>
+                <li><a href="guides.html" class="nav-link">Guides</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+                <li><a href="admin.html" class="nav-link admin-link"><i class="fas fa-shield-alt"></i> Admin</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button onclick="userManager.showLogin()" class="btn-login">Login</button>
+                <button onclick="userManager.showRegister()" class="btn-register">Register</button>
+            </div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero hero-vibrant">
+        <div class="hero-background">
+            <div class="hero-overlay hero-overlay-vibrant"></div>
+        </div>
+        <div class="hero-content hero-content-vibrant">
+            <h1 class="hero-title hero-title-vibrant">Explore the World's Best Destinations</h1>
+            <p class="hero-subtitle hero-subtitle-vibrant">Your ultimate guide to unforgettable travel experiences</p>
+            <div class="hero-buttons hero-buttons-vibrant">
+                <button onclick="displayFallbackDestinations()" class="btn-primary btn-primary-vibrant">
+                    <i class="fas fa-compass"></i> Discover Now
+                </button>
+                <button onclick="scrollToSection('gallery')" class="btn-secondary btn-secondary-vibrant">
+                    <i class="fas fa-play"></i> Watch Video
+                </button>
+            </div>
+        </div>
+        <div class="scroll-indicator scroll-indicator-vibrant">
+            <i class="fas fa-chevron-down scroll-icon-vibrant"></i>
+        </div>
+    </section>
+
+    <!-- Search Section -->
+    <section class="search-section search-section-vibrant">
+        <div class="container">
+            <div class="search-box search-box-vibrant">
+                <input type="text" id="search-input" placeholder="Search destinations..." class="search-input-vibrant">
+                <select id="category-filter" title="Filter destinations by category" aria-label="Filter destinations by category" class="category-filter-vibrant">
+                    <option value="">All Categories</option>
+                    <option value="beach">Beach</option>
+                    <option value="mountain">Mountain</option>
+                    <option value="city">City</option>
+                    <option value="cultural">Cultural</option>
+                </select>
+                <button onclick="searchDestinations()" class="search-btn search-btn-vibrant" title="Search destinations" aria-label="Search destinations">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Destinations Section -->
+    <section id="destinations" class="destinations destinations-vibrant">
+        <div class="container">
+            <div class="section-header section-header-vibrant">
+                <h2 class="section-title-vibrant">Popular Destinations</h2>
+                <p class="section-subtitle-vibrant">Discover breathtaking places around the world</p>
+            </div>
+            <div class="filter-tabs filter-tabs-vibrant">
+                <button class="filter-btn active filter-btn-active" data-filter="all">All</button>
+                <button class="filter-btn filter-btn-inactive" data-filter="beach">Beach</button>
+                <button class="filter-btn filter-btn-inactive" data-filter="mountain">Mountain</button>
+                <button class="filter-btn filter-btn-inactive" data-filter="city">City</button>
+                <button class="filter-btn filter-btn-inactive" data-filter="cultural">Cultural</button>
+                <button class="filter-btn filter-btn-inactive" data-filter="nature">Nature</button>
+            </div>
+            <div id="destination-list" class="destination-grid destination-grid-vibrant">
+                <!-- Destinations will be loaded here -->
+            </div>
+            <div class="load-more load-more-vibrant">
+                <button onclick="loadMoreDestinations()" class="btn-outline btn-outline-vibrant">Load More</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Travel Guides Section -->
+    <section id="guides" class="guides">
+        <div class="container">
+            <div class="section-header">
+                <h2>Expert Travel Guides</h2>
+                <p>Connect with local experts who know their destinations inside out</p>
+            </div>
+            <div id="guides-list" class="guide-cards">
+                <!-- Guides will be loaded here -->
+            </div>
+            <div class="view-all-guides-center">
+                <a href="guides.html" class="btn-outline btn-outline-vibrant view-all-guides-btn">View All Guides</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter newsletter-vibrant">
+        <div class="container">
+            <div class="newsletter-content newsletter-content-vibrant">
+                <h2 class="newsletter-title-vibrant">Stay Updated</h2>
+                <p class="newsletter-subtitle-vibrant">Get the latest travel tips and destination updates</p>
+                <div class="newsletter-form newsletter-form-vibrant">
+                    <input type="email" placeholder="Enter your email" class="newsletter-input-vibrant">
+                    <button type="submit" class="newsletter-btn-vibrant">Subscribe</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>TouristGuide</span>
+                    </div>
+                    <p>Your ultimate companion for discovering amazing destinations around the world.</p>
+                    <div class="social-links">
+                        <a href="#" title="Facebook" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" title="Twitter" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="Instagram" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" title="YouTube" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#destinations">Destinations</a></li>
+                        <li><a href="#guides">Travel Guides</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> info@touristguide.com</p>
+                        <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+                        <p><i class="fas fa-map-marker-alt"></i> New York, NY 10001</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 TouristGuide. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="back-to-top" title="Back to top" aria-label="Back to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- Modal for Gallery -->
+    <div id="gallery-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modal-image" src="" alt="">
+        </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="performance-optimizer.js"></script>
+    <script src="data-manager.js"></script>
+    <script>
+        // Define userManager globally before other scripts load
+        window.userManager = {
+            currentUser: JSON.parse(localStorage.getItem('currentUser') || 'null'),
+            showLogin: function() {
+                const modal = document.createElement('div');
+                modal.className = 'modal-backdrop';
+                modal.innerHTML = `
+                    <div class="auth-modal">
+                        <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                        <div class="auth-header">
+                            <div class="auth-icon">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <h2>Welcome Back</h2>
+                            <p>Sign in to your account</p>
+                        </div>
+                        <form onsubmit="userManager.handleLogin(event)" class="auth-form">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <i class="fas fa-envelope"></i>
+                                    <input type="email" name="email" placeholder="Email Address" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="password" name="password" placeholder="Password" required id="login-password">
+                                    <button type="button" class="toggle-password" onclick="userManager.togglePassword('login-password')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-options">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="remember">
+                                    <span class="checkmark"></span>
+                                    Remember me
+                                </label>
+                                <a href="#" class="forgot-link">Forgot Password?</a>
+                            </div>
+                            <button type="submit" class="auth-btn">
+                                <span class="btn-text">Sign In</span>
+                                <div class="btn-loader" style="display: none;">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                            </button>
+                        </form>
+                        <div class="auth-divider">
+                            <span>or continue with</span>
+                        </div>
+                        <div class="social-login">
+                            <button class="social-btn google-btn">
+                                <i class="fab fa-google"></i>
+                                Google
+                            </button>
+                            <button class="social-btn facebook-btn">
+                                <i class="fab fa-facebook-f"></i>
+                                Facebook
+                            </button>
+                        </div>
+                        <div class="auth-footer">
+                            <p>Don't have an account? <a href="#" onclick="userManager.showRegister(); this.closest('.modal-backdrop').remove();">Create Account</a></p>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            },
+            showRegister: function() {
+                const modal = document.createElement('div');
+                modal.className = 'modal-backdrop';
+                modal.innerHTML = `
+                    <div class="auth-modal register-modal">
+                        <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                        <div class="auth-header">
+                            <div class="auth-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <h2>Create Account</h2>
+                            <p>Join our travel community</p>
+                        </div>
+                        <form onsubmit="userManager.handleRegister(event)" class="auth-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <i class="fas fa-user"></i>
+                                        <input type="text" name="name" placeholder="Full Name" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <i class="fas fa-envelope"></i>
+                                        <input type="email" name="email" placeholder="Email Address" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <i class="fas fa-phone"></i>
+                                        <input type="tel" name="phone" placeholder="Phone Number" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <i class="fas fa-user-tag"></i>
+                                        <select name="role" required>
+                                            <option value="">Select Role</option>
+                                            <option value="user">Tourist</option>
+                                            <option value="guide">Tour Guide</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="password" name="password" placeholder="Password" required id="register-password" minlength="6">
+                                    <button type="button" class="toggle-password" onclick="userManager.togglePassword('register-password')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="password-strength" id="password-strength"></div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="password" name="confirmPassword" placeholder="Confirm Password" required id="confirm-password">
+                                </div>
+                            </div>
+                            <div class="form-group" id="guide-fields" style="display: none;">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <select name="destination" required>
+                                                <option value="">Select Destination</option>
+                                                <option value="Taj Mahal">Taj Mahal</option>
+                                                <option value="Goa Beaches">Goa Beaches</option>
+                                                <option value="Kerala Backwaters">Kerala Backwaters</option>
+                                                <option value="Rajasthan Palaces">Rajasthan Palaces</option>
+                                                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                                <option value="Mumbai City">Mumbai City</option>
+                                                <option value="Golden Temple">Golden Temple</option>
+                                                <option value="Varanasi Ghats">Varanasi Ghats</option>
+                                                <option value="Ladakh">Ladakh</option>
+                                                <option value="Andaman Islands">Andaman Islands</option>
+                                                <option value="Jaipur">Jaipur</option>
+                                                <option value="Delhi">Delhi</option>
+                                                <option value="Agra">Agra</option>
+                                                <option value="Udaipur">Udaipur</option>
+                                                <option value="Rishikesh">Rishikesh</option>
+                                                <option value="Manali">Manali</option>
+                                                <option value="Shimla">Shimla</option>
+                                                <option value="Darjeeling">Darjeeling</option>
+                                                <option value="Ooty">Ooty</option>
+                                                <option value="Kodaikanal">Kodaikanal</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <i class="fas fa-star"></i>
+                                            <input type="text" name="expertise" placeholder="Expertise (e.g., Cultural Tours)" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <i class="fas fa-info-circle"></i>
+                                        <textarea name="bio" placeholder="Tell us about your experience" rows="3" required></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-options">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="terms" required>
+                                    <span class="checkmark"></span>
+                                    I agree to the <a href="#">Terms & Conditions</a>
+                                </label>
+                            </div>
+                            <button type="submit" class="auth-btn">
+                                <span class="btn-text">Create Account</span>
+                                <div class="btn-loader" style="display: none;">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                            </button>
+                        </form>
+                        <div class="auth-footer">
+                            <p>Already have an account? <a href="#" onclick="userManager.showLogin(); this.closest('.modal-backdrop').remove();">Sign In</a></p>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                
+                // Setup role change functionality
+                const roleSelect = modal.querySelector('select[name="role"]');
+                const guideFields = modal.querySelector('#guide-fields');
+                
+                roleSelect.addEventListener('change', function() {
+                    if (this.value === 'guide') {
+                        guideFields.style.display = 'block';
+                        // Populate destinations dynamically
+                        const destinationSelect = modal.querySelector('select[name="destination"]');
+                        const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]');
+                        
+                        // Add saved destinations to the select
+                        savedDestinations.forEach(dest => {
+                            if (dest.name && !destinationSelect.querySelector(`option[value="${dest.name}"]`)) {
+                                const option = document.createElement('option');
+                                option.value = dest.name;
+                                option.textContent = dest.name;
+                                destinationSelect.appendChild(option);
+                            }
+                        });
+                    } else {
+                        guideFields.style.display = 'none';
+                    }
+                });
+            },
+            handleLogin: function(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const email = formData.get('email');
+                const password = formData.get('password');
+                
+                // Simple login logic
+                const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+                const user = allUsers.find(u => u.email === email);
+                
+                if (user) {
+                    this.currentUser = user;
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    localStorage.setItem('activeUserId', String(user.id));
+                    localStorage.setItem('lastLoggedInEmail', user.email || '');
+                    try { window.name = JSON.stringify({ tgUser: user }); } catch (e) {}
+                    event.target.closest('.modal-backdrop').remove();
+                    showNotification('Login successful!', 'success');
+                    this.updateUI();
+                } else {
+                    showNotification('Invalid credentials', 'error');
+                }
+            },
+            handleRegister: function(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                
+                // Check password confirmation
+                if (formData.get('password') !== formData.get('confirmPassword')) {
+                    showNotification('Passwords do not match', 'error');
+                    return;
+                }
+                
+                // Check if guide selected destination
+                if (formData.get('role') === 'guide' && !formData.get('destination')) {
+                    showNotification('Please select a destination to guide', 'error');
+                    return;
+                }
+                // Check if email already exists
+                const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+                if (allUsers.find(u => u.email === formData.get('email'))) {
+                    showNotification('Email already registered', 'error');
+                    return;
+                }
+                
+                const user = {
+                    id: Date.now(),
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    role: formData.get('role') || 'user',
+                    bookings: [],
+                    joinDate: new Date().toISOString()
+                };
+                
+                // Add guide-specific fields
+                if (user.role === 'guide') {
+                    user.destination = formData.get('destination');
+                    user.location = formData.get('destination');
+                    user.expertise = formData.get('expertise');
+                    user.bio = formData.get('bio');
+                    user.rating = 4.5;
+                    user.experience = 1;
+                    user.rate = 100;
+                    user.languages = ['Hindi', 'English'];
+                }
+                
+                allUsers.push(user);
+                localStorage.setItem('allUsers', JSON.stringify(allUsers));
+                
+                this.currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                localStorage.setItem('activeUserId', String(user.id));
+                localStorage.setItem('lastLoggedInEmail', user.email || '');
+                try { window.name = JSON.stringify({ tgUser: user }); } catch (e) {}
+                
+                event.target.closest('.modal-backdrop').remove();
+                showNotification(`Welcome ${user.name}! Registration successful!`, 'success');
+                this.updateUI();
+            },
+            updateUI: function() {
+                const authButtons = document.querySelector('.auth-buttons');
+                if (authButtons && this.currentUser) {
+                    const unreadCount = this.getUnreadNotificationCount();
+                    const notificationBadge = unreadCount > 0 ? `<span class="notification-badge">${unreadCount}</span>` : '';
+                    
+                    authButtons.innerHTML = `
+                        <button onclick="userManager.showNotifications()" class="btn-notifications">
+                            <i class="fas fa-bell"></i>${notificationBadge}
+                        </button>
+                        <button onclick="userManager.showMessages()" class="btn-messages">
+                            <i class="fas fa-envelope"></i>
+                        </button>
+                        <a href="dashboard.html" class="btn-dashboard-link">Dashboard</a>
+                        <span>Welcome, ${this.currentUser.name}</span>
+                        <button onclick="userManager.logout()" class="btn-logout">Logout</button>
+                    `;
+                }
+            },
+            logout: function() {
+                this.currentUser = null;
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('activeUserId');
+                localStorage.removeItem('lastLoggedInEmail');
+                try { window.name = ''; } catch (e) {}
+                const authButtons = document.querySelector('.auth-buttons');
+                if (authButtons) {
+                    authButtons.innerHTML = `
+                        <button onclick="userManager.showLogin()" class="btn-login">Login</button>
+                        <button onclick="userManager.showRegister()" class="btn-register">Register</button>
+                    `;
+                }
+                showNotification('Logged out successfully', 'info');
+            },
+            getUnreadNotificationCount: function() {
+                if (!this.currentUser) return 0;
+                const notifications = this.currentUser.notifications || [];
+                return notifications.filter(n => !n.read).length;
+            },
+            showNotifications: function() {
+                if (!this.currentUser) return;
+                
+                const notifications = this.currentUser.notifications || [];
+                const modal = document.createElement('div');
+                modal.className = 'modal-backdrop';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                        <h2><i class="fas fa-bell"></i> Notifications</h2>
+                        <div class="notifications-list">
+                            ${notifications.length > 0 ? 
+                                notifications.map(notification => `
+                                    <div class="notification-item ${notification.read ? 'read' : 'unread'}">
+                                        <div class="notification-header">
+                                            <h4>${notification.title}</h4>
+                                            <span class="notification-date">${new Date(notification.date).toLocaleDateString()}</span>
+                                        </div>
+                                        <p>${notification.message}</p>
+                                        ${notification.bookingId ? `<small>Booking ID: ${notification.bookingId}</small>` : ''}
+                                    </div>
+                                `).join('') : 
+                                '<div class="empty-state"><i class="fas fa-bell-slash"></i><p>No notifications</p></div>'
+                            }
+                        </div>
+                        <div class="notification-actions">
+                            <button onclick="userManager.markAllAsRead(); this.closest('.modal-backdrop').remove();" class="btn-secondary">Mark All as Read</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            },
+            showMessages: function() {
+                if (!this.currentUser) return;
+                
+                const messages = this.currentUser.messages || [];
+                const sentMessages = this.currentUser.sentMessages || [];
+                const allMessages = [...messages, ...sentMessages].sort((a, b) => new Date(b.date) - new Date(a.date));
+                const modal = document.createElement('div');
+                modal.className = 'modal-backdrop';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal(this)">&times;</span>
+                        <h2><i class="fas fa-envelope"></i> Messages</h2>
+                        <div class="messages-list">
+                            ${allMessages.length > 0 ? 
+                                allMessages.map(message => `
+                                    <div class="message-item ${message.read ? 'read' : 'unread'}" onclick="userManager.openMessage('${message.id}')">
+                                        <div class="message-header">
+                                            <h4>${message.subject}</h4>
+                                            <span class="message-date">${new Date(message.date).toLocaleDateString()}</span>
+                                        </div>
+                                        <p class="message-preview">${message.message.substring(0, 100)}...</p>
+                                        <div class="message-meta">
+                                            <span>${message.from == this.currentUser.id ? 'To: ' + message.toName : 'From: ' + message.fromName}</span>
+                                            ${message.bookingId ? `<span>Booking: ${message.bookingId}</span>` : ''}
+                                        </div>
+                                    </div>
+                                `).join('') : 
+                                '<div class="empty-state"><i class="fas fa-inbox"></i><p>No messages</p></div>'
+                            }
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            },
+            openMessage: function(messageId) {
+                if (!this.currentUser) return;
+                const messages = [...(this.currentUser.messages || []), ...(this.currentUser.sentMessages || [])];
+                const message = messages.find(m => m.id == messageId);
+                if (!message) return;
+
+                if (message.to == this.currentUser.id && !message.read) {
+                    this.markMessageAsRead(messageId);
+                }
+
+                const modal = document.createElement('div');
+                modal.className = 'modal-backdrop';
+                modal.innerHTML = `
+                    <div class="modal-content message-detail-modal">
+                        <span class="close" onclick="closeModal(this)">&times;</span>
+                        <h2>${message.subject}</h2>
+                        <p><strong>${message.from == this.currentUser.id ? 'To' : 'From'}:</strong> ${message.from == this.currentUser.id ? message.toName : message.fromName}</p>
+                        <p><strong>Date:</strong> ${new Date(message.date).toLocaleString()}</p>
+                        ${message.bookingId ? `<p><strong>Booking ID:</strong> ${message.bookingId}</p>` : ''}
+                        <div class="message-body">
+                            <p>${message.message}</p>
+                        </div>
+                        <div class="message-actions">
+                            ${message.from != this.currentUser.id ? `<button onclick="userManager.replyToMessage('${message.id}')" class="btn-primary">Reply</button>` : ''}
+                            <button onclick="closeModal(this)" class="btn-secondary">Close</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            },
+            replyToMessage: function(originalMessageId) {
+                if (!this.currentUser) return;
+                const messages = [...(this.currentUser.messages || []), ...(this.currentUser.sentMessages || [])];
+                const originalMessage = messages.find(m => m.id == originalMessageId);
+                if (!originalMessage) return;
+
+                const previousModalClose = document.querySelector('.message-detail-modal .close');
+                if (previousModalClose) closeModal(previousModalClose);
+
+                const recipientId = originalMessage.from == this.currentUser.id ? originalMessage.to : originalMessage.from;
+                const recipientName = originalMessage.from == this.currentUser.id ? originalMessage.toName : originalMessage.fromName;
+                const modal = document.createElement('div');
+                modal.className = 'modal-backdrop';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal(this)">&times;</span>
+                        <h2><i class="fas fa-reply"></i> Reply to ${recipientName}</h2>
+                        <form onsubmit="userManager.sendReply(event, '${recipientId}', '${originalMessage.bookingId || ''}')">
+                            <div class="form-group">
+                                <label>Subject</label>
+                                <input type="text" name="subject" value="Re: ${originalMessage.subject}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Message</label>
+                                <textarea name="message" rows="4" placeholder="Type your reply..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-paper-plane"></i> Send Reply
+                            </button>
+                        </form>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            },
+            sendReply: function(event, recipientId, bookingId) {
+                event.preventDefault();
+                if (!this.currentUser) return;
+
+                const formData = new FormData(event.target);
+                const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+                const recipientIndex = allUsers.findIndex(u => u.id == recipientId);
+                if (recipientIndex === -1) return;
+
+                const message = {
+                    id: Date.now(),
+                    from: this.currentUser.id,
+                    fromName: this.currentUser.name,
+                    to: recipientId,
+                    toName: allUsers[recipientIndex].name,
+                    subject: formData.get('subject'),
+                    message: formData.get('message'),
+                    bookingId: bookingId || '',
+                    date: new Date().toISOString(),
+                    read: false
+                };
+
+                allUsers[recipientIndex].messages = allUsers[recipientIndex].messages || [];
+                allUsers[recipientIndex].messages.push(message);
+                allUsers[recipientIndex].notifications = allUsers[recipientIndex].notifications || [];
+                allUsers[recipientIndex].notifications.push({
+                    id: Date.now() + 1,
+                    type: 'message',
+                    title: 'New Message',
+                    message: `${this.currentUser.name} sent you a message.`,
+                    bookingId: bookingId || '',
+                    read: false,
+                    date: new Date().toISOString()
+                });
+
+                this.currentUser.sentMessages = this.currentUser.sentMessages || [];
+                this.currentUser.sentMessages.push(message);
+                const senderIndex = allUsers.findIndex(u => u.id == this.currentUser.id);
+                if (senderIndex !== -1) {
+                    allUsers[senderIndex].sentMessages = allUsers[senderIndex].sentMessages || [];
+                    allUsers[senderIndex].sentMessages.push(message);
+                }
+
+                localStorage.setItem('allUsers', JSON.stringify(allUsers));
+                localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+
+                closeModal(event.target);
+                showNotification('Reply sent successfully!', 'success');
+            },
+            markMessageAsRead: function(messageId) {
+                if (!this.currentUser) return;
+                const messages = this.currentUser.messages || [];
+                const message = messages.find(m => m.id == messageId);
+                if (!message) return;
+
+                message.read = true;
+                localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+
+                const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+                const userIndex = allUsers.findIndex(u => u.id === this.currentUser.id);
+                if (userIndex > -1) {
+                    allUsers[userIndex] = this.currentUser;
+                    localStorage.setItem('allUsers', JSON.stringify(allUsers));
+                }
+            },
+            markAllAsRead: function() {
+                if (!this.currentUser) return;
+                
+                const notifications = this.currentUser.notifications || [];
+                notifications.forEach(n => n.read = true);
+                localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+                
+                // Update in allUsers as well
+                const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+                const userIndex = allUsers.findIndex(u => u.id === this.currentUser.id);
+                if (userIndex > -1) {
+                    allUsers[userIndex] = this.currentUser;
+                    localStorage.setItem('allUsers', JSON.stringify(allUsers));
+                }
+                
+                this.updateUI();
+                showNotification('All notifications marked as read', 'success');
+            },
+            togglePassword: function(inputId) {
+                const input = document.getElementById(inputId);
+                const button = input.parentElement.querySelector('.toggle-password i');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    button.className = 'fas fa-eye-slash';
+                } else {
+                    input.type = 'password';
+                    button.className = 'fas fa-eye';
+                }
+            }
+        };
+        
+        // Update UI on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (userManager.currentUser) {
+                if (typeof userManager.updateUIForLoggedInUser === 'function') {
+                    userManager.updateUIForLoggedInUser();
+                } else if (typeof userManager.updateUI === 'function') {
+                    userManager.updateUI();
+                }
+            }
+        });
+    </script>
+    <script src="remote-sync.js?v=3"></script>
+    <script src="user-manager.js"></script>
+    <script src="review-system.js"></script>
+    <script src="logo-global.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Global showNotification function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: 20px; z-index: 10001;
+                padding: 12px 20px; border-radius: 8px; color: white; font-weight: 600;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                animation: slideInRight 0.3s ease-out;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 3000);
+        }
+        
+        // Immediate data loading
+        document.addEventListener('DOMContentLoaded', function() {
+            // Remove duplicate function call
+        });
+
+    </script>
+    <script>
+        // Load saved logo on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded - Starting initialization');
+            // Remove stale full-screen overlays that can block all clicks/navigation.
+            document.querySelectorAll('.modal-backdrop').forEach(modal => {
+                if (!modal.querySelector('.modal-content')) {
+                    modal.remove();
+                }
+            });
+            const loadingIndicator = document.getElementById('loading-indicator');
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+                loadingIndicator.style.pointerEvents = 'none';
+            }
+
+            updateLogoOnPage();
+            
+            // Monitor destination container for changes
+            monitorDestinationContainer();
+            
+            // Force load destinations immediately with a small delay to ensure DOM is ready
+            setTimeout(() => {
+                console.log('Loading destinations and guides...');
+                displayFallbackDestinations();
+                loadGuides();
+            }, 50);
+            
+            setupEventListeners();
+            setupScrollAnimations();
+            
+            // Check for destination updates every 5 seconds (reduced frequency)
+            setInterval(checkForDestinationUpdates, 5000);
+            
+            // Check for guide updates (reduced frequency)
+            setInterval(loadGuides, 10000);
+            
+            // Initialize data tracking
+            window.lastDestinationData = JSON.stringify(JSON.parse(localStorage.getItem('destinations') || '[]'));
+            
+            console.log('Initialization complete');
+        });
+        
+        // Debug function to monitor destination container
+        function monitorDestinationContainer() {
+            const container = document.getElementById('destination-list');
+            if (container) {
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'childList') {
+                            console.log('Destination container changed:', mutation);
+                            console.log('Current content:', container.innerHTML.length, 'characters');
+                            
+                            // If container becomes empty, reload destinations
+                            if (container.innerHTML.trim() === '' || container.innerHTML.includes('Loading destinations')) {
+                                console.log('Container is empty, reloading destinations...');
+                                setTimeout(() => {
+                                    displayFallbackDestinations();
+                                }, 100);
+                            }
+                        }
+                    });
+                });
+                
+                observer.observe(container, {
+                    childList: true,
+                    subtree: true
+                });
+                
+                console.log('Destination container monitor started');
+            }
+        }
+        
+        function checkForDestinationUpdates() {
+            const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]');
+            const currentData = JSON.stringify(savedDestinations);
+            
+            if (currentData !== window.lastDestinationData) {
+                console.log('Destinations updated, reloading...');
+                displayFallbackDestinations();
+                window.lastDestinationData = currentData;
+            }
+        }
+        
+        // Listen for storage changes from admin panel
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'destinations') {
+                displayFallbackDestinations();
+            }
+        });
+        
+        // Listen for custom events for same-tab updates
+        window.addEventListener('destinationsUpdated', function() {
+            displayFallbackDestinations();
+        });
+        
+        function updateLogoOnPage() {
+            const savedLogo = localStorage.getItem('siteLogo');
+            const savedName = localStorage.getItem('siteName');
+            
+            if (savedLogo) {
+                const logoIcons = document.querySelectorAll('.logo i, .footer-logo i');
+                logoIcons.forEach(icon => {
+                    const img = document.createElement('img');
+                    img.src = savedLogo;
+                    img.style.width = '40px';
+                    img.style.height = '40px';
+                    img.style.objectFit = 'contain';
+                    img.style.marginRight = '0.5rem';
+                    icon.parentNode.replaceChild(img, icon);
+                });
+            }
+            
+            if (savedName) {
+                const nameElements = document.querySelectorAll('.logo span, .footer-logo span');
+                nameElements.forEach(el => el.textContent = savedName);
+            }
+        }
+
+        function setupEventListeners() {
+            // Mobile menu toggle
+            const hamburger = document.querySelector('.hamburger');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            if (hamburger && navMenu) {
+                hamburger.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                });
+            }
+
+            // Search functionality
+            const searchInput = document.getElementById('search-input');
+            const searchBtn = document.querySelector('.search-btn');
+            
+            if (searchInput && searchBtn) {
+                searchBtn.addEventListener('click', () => {
+                    const query = searchInput.value.trim();
+                    if (query) {
+                        window.location.href = `destinations.html?search=${encodeURIComponent(query)}`;
+                    }
+                });
+                
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const query = searchInput.value.trim();
+                        if (query) {
+                            window.location.href = `destinations.html?search=${encodeURIComponent(query)}`;
+                        }
+                    }
+                });
+            }
+
+            // Newsletter form
+            const newsletterForm = document.querySelector('.newsletter-form');
+            if (newsletterForm) {
+                newsletterForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const email = newsletterForm.querySelector('input[type="email"]').value;
+                    if (email) {
+                        alert('Thank you for subscribing!');
+                        newsletterForm.querySelector('input[type="email"]').value = '';
+                    }
+                });
+            }
+
+            // Back to top button
+            const backToTop = document.getElementById('back-to-top');
+            if (backToTop) {
+                window.addEventListener('scroll', () => {
+                    if (window.pageYOffset > 300) {
+                        backToTop.classList.add('show');
+                    } else {
+                        backToTop.classList.remove('show');
+                    }
+                });
+                
+                backToTop.addEventListener('click', () => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+        }
+
+        function setupScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.fade-in-section').forEach(section => {
+                observer.observe(section);
+            });
+        }
+        
+
+        
+        function loadGuides() {
+            const container = document.getElementById('guides-list');
+            if (container) {
+                // Get registered guides from localStorage
+                const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+                const guides = allUsers.filter(user => user.role === 'guide');
+                
+                if (guides.length > 0) {
+                    container.innerHTML = guides.slice(0, 3).map(guide => createGuideCard(guide)).join('');
+                } else {
+                    container.innerHTML = '<p>No registered guides available. <a href="#" onclick="userManager.showRegister()">Register as a guide</a></p>';
+                }
+            }
+        }
+        
+        function createGuideCard(guide) {
+            return `
+                <div class="guide-card enhanced" onclick="showGuideProfile('${guide.id}')">
+                    <div class="guide-header">
+                        <div class="guide-photo-container">
+                            <img src="${guide.photo || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'}" alt="${guide.name}" class="guide-photo">
+                            <div class="guide-status online"></div>
+                        </div>
+                        <div class="guide-info">
+                            <h3>${guide.name}</h3>
+                            <p class="guide-location">
+                                <i class="fas fa-map-marker-alt"></i> ${guide.destination || guide.location || 'India'}
+                            </p>
+                            <div class="guide-stats">
+                                <span class="guide-rating">
+                                    <i class="fas fa-star"></i> ${guide.rating || '4.5'}
+                                </span>
+                                <span class="guide-experience">${guide.experience || '5'}+ years</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="guide-bio">${guide.bio || 'Professional tour guide with local expertise'}</p>
+                    <div class="guide-specialties">
+                        <span class="specialty-tag">${guide.expertise || 'General Tours'}</span>
+                    </div>
+                    <div class="guide-footer">
+                        <div class="guide-rate">
+                            <i class="fas fa-rupee-sign"></i>${guide.rate || '100'}/hr
+                        </div>
+                        <button class="book-guide-btn" onclick="event.stopPropagation(); bookGuide('${guide.id}')">
+                            <i class="fas fa-calendar-check"></i> Book Now
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function showGuideProfile(guideId) {
+            const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            const guide = allUsers.find(u => u.id == guideId && u.role === 'guide');
+            if (!guide) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.innerHTML = `
+                <div class="guide-profile-modal">
+                    <span class="close" onclick="closeModal(this)">&times;</span>
+                    <div class="guide-profile-header">
+                        <div class="guide-avatar">
+                            <img src="${guide.photo || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'}" alt="${guide.name}">
+                            <div class="guide-badge">
+                                <i class="fas fa-certificate"></i> Verified Guide
+                            </div>
+                        </div>
+                        <div class="guide-details">
+                            <h2>${guide.name}</h2>
+                            <p class="guide-title">${guide.expertise || 'Professional Tour Guide'}</p>
+                            <div class="guide-location-info">
+                                <i class="fas fa-map-marker-alt"></i> ${guide.destination || guide.location || 'India'}
+                            </div>
+                            <div class="guide-metrics">
+                                <div class="metric">
+                                    <span class="metric-value">${guide.rating || '4.5'}</span>
+                                    <span class="metric-label">Rating</span>
+                                    <div class="stars">${'★'.repeat(Math.floor(guide.rating || 4.5))}${'☆'.repeat(5-Math.floor(guide.rating || 4.5))}</div>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-value">${guide.experience || '5'}+</span>
+                                    <span class="metric-label">Years Exp</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-value">₹${guide.rate || '100'}</span>
+                                    <span class="metric-label">Per Hour</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="guide-profile-content">
+                        <div class="profile-section">
+                            <h3><i class="fas fa-user"></i> About</h3>
+                            <p>${guide.bio || 'Professional tour guide with extensive local knowledge and experience in providing memorable travel experiences.'}</p>
+                        </div>
+                        <div class="profile-section">
+                            <h3><i class="fas fa-star"></i> Specialties</h3>
+                            <div class="specialties-grid">
+                                <span class="specialty-chip">${guide.expertise || 'Cultural Tours'}</span>
+                                <span class="specialty-chip">Local Cuisine</span>
+                                <span class="specialty-chip">Historical Sites</span>
+                            </div>
+                        </div>
+                        <div class="profile-section">
+                            <h3><i class="fas fa-language"></i> Languages</h3>
+                            <div class="languages">
+                                ${(guide.languages || ['Hindi', 'English']).map(lang => `<span class="language-tag">${lang}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="profile-section">
+                            <h3><i class="fas fa-envelope"></i> Contact</h3>
+                            <div class="contact-info">
+                                <p><i class="fas fa-envelope"></i> ${guide.email}</p>
+                                <p><i class="fas fa-phone"></i> ${guide.phone}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="guide-profile-footer">
+                        <button class="btn-primary" onclick="bookGuide('${guide.id}'); closeModal(this);">Book This Guide</button>
+                        <button class="btn-secondary" onclick="closeModal(this)">Close</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function bookGuide(guideId) {
+            if (!userManager.currentUser) {
+                userManager.showLogin();
+                return;
+            }
+            
+            const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            const guide = allUsers.find(u => u.id == guideId);
+            if (!guide) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal(this)">&times;</span>
+                    <h2>Book ${guide.name}</h2>
+                    <form onsubmit="submitGuideBooking(event, '${guide.id}')">
+                        <div class="form-group">
+                            <label>Tour Date</label>
+                            <input type="date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Duration (hours)</label>
+                            <input type="number" name="hours" min="1" max="12" value="4" required onchange="calculateGuidePrice('${guide.rate || 100}')">
+                        </div>
+                        <div class="form-group">
+                            <label>Group Size</label>
+                            <input type="number" name="people" min="1" max="15" value="2" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tour Type</label>
+                            <select name="tourType" required>
+                                <option value="cultural">Cultural Tour</option>
+                                <option value="food">Food Tour</option>
+                                <option value="historical">Historical Tour</option>
+                                <option value="custom">Custom Tour</option>
+                            </select>
+                        </div>
+                        <div class="price-summary">
+                            <h3>Total: <span id="guide-total-price">₹${(guide.rate || 100) * 4}</span></h3>
+                        </div>
+                        <button type="submit" class="btn-primary">Book Guide</button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function calculateGuidePrice(hourlyRate) {
+            const hours = parseInt(document.querySelector('input[name="hours"]')?.value || 4);
+            const total = hourlyRate * hours;
+            const totalElement = document.getElementById('guide-total-price');
+            if (totalElement) totalElement.textContent = `₹${total}`;
+        }
+        
+        function submitGuideBooking(event, guideId) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const hours = parseInt(formData.get('hours'));
+            const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            const guide = allUsers.find(u => u.id == guideId);
+            if (!guide || !userManager.currentUser) return;
+            const amount = (guide.rate || 100) * hours;
+            
+            const booking = {
+                id: Date.now(),
+                type: 'guide',
+                guide: guide.name,
+                guideId: guideId,
+                customerName: userManager.currentUser.name,
+                customerId: userManager.currentUser.id,
+                customerEmail: userManager.currentUser.email,
+                customerPhone: userManager.currentUser.phone,
+                date: formData.get('date'),
+                hours: hours,
+                people: formData.get('people'),
+                tourType: formData.get('tourType'),
+                amount: amount,
+                status: 'confirmed',
+                bookingDate: new Date().toISOString()
+            };
+
+            const bookingMessage = {
+                id: Date.now() + 2,
+                from: userManager.currentUser.id,
+                fromName: userManager.currentUser.name,
+                to: guideId,
+                toName: guide.name,
+                subject: `New booking #${booking.id} from ${userManager.currentUser.name}`,
+                message: `${userManager.currentUser.name} booked you for ${hours} hour(s) on ${formData.get('date')} for ${formData.get('people')} people (${formData.get('tourType')} tour).`,
+                bookingId: booking.id,
+                date: new Date().toISOString(),
+                read: false
+            };
+            
+            // Add booking to customer
+            if (userManager.currentUser) {
+                userManager.currentUser.bookings = userManager.currentUser.bookings || [];
+                userManager.currentUser.bookings.push(booking);
+                localStorage.setItem('currentUser', JSON.stringify(userManager.currentUser));
+            }
+
+            // Keep tourist bookings synced in allUsers for future logins
+            const customerIndex = allUsers.findIndex(u => u.id == userManager.currentUser.id);
+            if (customerIndex !== -1) {
+                allUsers[customerIndex].bookings = allUsers[customerIndex].bookings || [];
+                allUsers[customerIndex].bookings.push(booking);
+            }
+            
+            // Add booking notification to guide
+            const guideIndex = allUsers.findIndex(u => u.id == guideId);
+            if (guideIndex !== -1) {
+                allUsers[guideIndex].bookings = allUsers[guideIndex].bookings || [];
+                allUsers[guideIndex].bookings.push(booking);
+                
+                allUsers[guideIndex].notifications = allUsers[guideIndex].notifications || [];
+                allUsers[guideIndex].notifications.push({
+                    id: Date.now(),
+                    type: 'booking',
+                    title: 'New Booking Received!',
+                    message: `${userManager.currentUser.name} has booked you for ${hours} hours on ${formData.get('date')}`,
+                    bookingId: booking.id,
+                    read: false,
+                    date: new Date().toISOString()
+                });
+
+                // Ensure guide also gets booking details in Messages inbox
+                allUsers[guideIndex].messages = allUsers[guideIndex].messages || [];
+                allUsers[guideIndex].messages.push(bookingMessage);
+                
+                localStorage.setItem('allUsers', JSON.stringify(allUsers));
+            }
+
+            // Keep tourist sent thread consistent so both sides can continue chat
+            userManager.currentUser.sentMessages = userManager.currentUser.sentMessages || [];
+            userManager.currentUser.sentMessages.push(bookingMessage);
+            const touristIndex = allUsers.findIndex(u => u.id == userManager.currentUser.id);
+            if (touristIndex !== -1) {
+                allUsers[touristIndex].sentMessages = allUsers[touristIndex].sentMessages || [];
+                allUsers[touristIndex].sentMessages.push(bookingMessage);
+                localStorage.setItem('allUsers', JSON.stringify(allUsers));
+            }
+            localStorage.setItem('currentUser', JSON.stringify(userManager.currentUser));
+            
+            closeModal(event.target);
+            showNotification(`Guide ${guide.name} booked successfully!`, 'success');
+            
+            // Show messaging option
+            setTimeout(() => {
+                if (confirm('Would you like to send a message to your guide?')) {
+                    showMessagingModal(guideId, booking.id);
+                }
+            }, 1000);
+        }
+        
+        function showMessagingModal(guideId, bookingId) {
+            const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            const guide = allUsers.find(u => u.id == guideId);
+            if (!guide) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal(this)">&times;</span>
+                    <h2><i class="fas fa-comments"></i> Message ${guide.name}</h2>
+                    <div class="booking-info">
+                        <p><strong>Booking ID:</strong> ${bookingId}</p>
+                        <p><strong>Guide:</strong> ${guide.name}</p>
+                        <p><strong>Destination:</strong> ${guide.destination || guide.location}</p>
+                    </div>
+                    <form onsubmit="sendMessageToGuide(event, '${guideId}', '${bookingId}')">
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <input type="text" name="subject" value="Regarding booking #${bookingId}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Message</label>
+                            <textarea name="message" rows="4" placeholder="Hi ${guide.name}, I have booked you for a tour. Looking forward to it!" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-paper-plane"></i> Send Message
+                        </button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function sendMessageToGuide(event, guideId, bookingId) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            const guideIndex = allUsers.findIndex(u => u.id == guideId);
+            
+            if (guideIndex !== -1) {
+                const message = {
+                    id: Date.now(),
+                    from: userManager.currentUser.id,
+                    fromName: userManager.currentUser.name,
+                    to: guideId,
+                    toName: allUsers[guideIndex].name,
+                    subject: formData.get('subject'),
+                    message: formData.get('message'),
+                    bookingId: bookingId,
+                    date: new Date().toISOString(),
+                    read: false
+                };
+                
+                // Add to guide's messages
+                allUsers[guideIndex].messages = allUsers[guideIndex].messages || [];
+                allUsers[guideIndex].messages.push(message);
+                allUsers[guideIndex].notifications = allUsers[guideIndex].notifications || [];
+                allUsers[guideIndex].notifications.push({
+                    id: Date.now() + 1,
+                    type: 'message',
+                    title: 'New Message',
+                    message: `${userManager.currentUser.name} sent you a message about booking #${bookingId}.`,
+                    bookingId: bookingId,
+                    read: false,
+                    date: new Date().toISOString()
+                });
+                
+                // Add to customer's sent messages
+                userManager.currentUser.sentMessages = userManager.currentUser.sentMessages || [];
+                userManager.currentUser.sentMessages.push(message);
+                const customerIndex = allUsers.findIndex(u => u.id == userManager.currentUser.id);
+                if (customerIndex !== -1) {
+                    allUsers[customerIndex].sentMessages = allUsers[customerIndex].sentMessages || [];
+                    allUsers[customerIndex].sentMessages.push(message);
+                }
+                
+                localStorage.setItem('allUsers', JSON.stringify(allUsers));
+                localStorage.setItem('currentUser', JSON.stringify(userManager.currentUser));
+                
+                closeModal(event.target);
+                showNotification('Message sent to guide successfully!', 'success');
+            }
+        }
+        
+        function displayFallbackDestinations() {
+            // Get saved destinations from admin panel
+            const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]');
+            console.log('Loading destinations:', savedDestinations.length, 'saved destinations');
+            console.log('Saved destinations:', savedDestinations);
+            
+            const fallbackData = [
+                {
+                    id: 1,
+                    name: "Taj Mahal",
+                    description: "Iconic white marble mausoleum and UNESCO World Heritage Site in Agra.",
+                    bestTime: "October to March",
+                    rating: 4.9,
+                    category: "cultural",
+                    imageUrl: "https://images.unsplash.com/photo-1548013146-72479768bada?w=400"
+                },
+                {
+                    id: 2,
+                    name: "Goa Beaches",
+                    description: "Beautiful beaches with Portuguese heritage and vibrant nightlife.",
+                    bestTime: "November to February",
+                    rating: 4.7,
+                    category: "beach",
+                    imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400"
+                },
+                {
+                    id: 3,
+                    name: "Kerala Backwaters",
+                    description: "Serene backwaters with houseboat cruises and lush greenery.",
+                    bestTime: "September to March",
+                    rating: 4.8,
+                    category: "nature",
+                    imageUrl: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400"
+                },
+                {
+                    id: 4,
+                    name: "Rajasthan Palaces",
+                    description: "Magnificent palaces and forts showcasing royal heritage.",
+                    bestTime: "October to March",
+                    rating: 4.8,
+                    category: "cultural",
+                    imageUrl: "https://images.unsplash.com/photo-1609920658906-8223bd289001?w=400"
+                },
+                {
+                    id: 5,
+                    name: "Himachal Pradesh",
+                    description: "Snow-capped mountains and scenic hill stations.",
+                    bestTime: "March to June",
+                    rating: 4.9,
+                    category: "mountain",
+                    imageUrl: "https://images.unsplash.com/photo-1605640840605-14ac1855827b?w=400"
+                },
+                {
+                    id: 6,
+                    name: "Mumbai City",
+                    description: "Bollywood capital and financial hub with vibrant culture.",
+                    bestTime: "November to February",
+                    rating: 4.5,
+                    category: "city",
+                    imageUrl: "https://images.unsplash.com/photo-1595658658481-d53d3f999875?w=400"
+                }
+            ];
+            
+            // Use saved destinations if available, otherwise use fallback
+            const destinationsToShow = savedDestinations.length > 0 ? savedDestinations : fallbackData;
+            
+            console.log('Destinations to show:', destinationsToShow.length);
+            
+            // Debug: Log first destination to check image field
+            if (destinationsToShow.length > 0) {
+                console.log('First destination:', destinationsToShow[0]);
+            }
+            
+            const container = document.getElementById('destination-list');
+            if (container) {
+                if (destinationsToShow.length === 0) {
+                    container.innerHTML = '<p>No destinations available</p>';
+                    return;
+                }
+                
+                console.log('About to render destinations:', destinationsToShow.length);
+                
+                container.innerHTML = destinationsToShow.slice(0, 6).map(destination => {
+                    // Get image URL with better fallback logic
+                    let imageUrl = destination.imageUrl || destination.image;
+                    
+                    // If no image URL, provide category-specific fallback
+                    if (!imageUrl || imageUrl.trim() === '') {
+                        const categoryImages = {
+                            'cultural': 'https://images.unsplash.com/photo-1548013146-72479768bada?w=400',
+                            'beach': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
+                            'nature': 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400',
+                            'mountain': 'https://images.unsplash.com/photo-1605640840605-14ac1855827b?w=400',
+                            'city': 'https://images.unsplash.com/photo-1595658658481-d53d3f999875?w=400',
+                            'adventure': 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400'
+                        };
+                        imageUrl = categoryImages[destination.category] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400';
+                    }
+                    
+                    console.log(`Rendering ${destination.name} with image: ${imageUrl}`);
+                    
+                    return `
+                        <div class="destination-card" data-category="${destination.category}" onclick="viewDestination('${destination.name}')">
+                            <img src="${imageUrl}" alt="${destination.name}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400'">
+                            <div class="card-content">
+                                <h3>${destination.name}</h3>
+                                <p class="description">${destination.description}</p>
+                                <p class="best-time"><i class="fas fa-calendar"></i> <strong>Best Time:</strong> ${destination.bestTime}</p>
+                                <div class="card-footer">
+                                    <div class="rating">
+                                        <i class="fas fa-star"></i>
+                                        <span>${destination.rating}/5</span>
+                                    </div>
+                                    <button class="book-btn" onclick="event.stopPropagation(); bookDestination('${destination.name}')">
+                                        <i class="fas fa-bookmark"></i> Book Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                console.log('Destinations rendered successfully');
+                
+                // Show/hide load more button
+                const loadMoreBtn = document.querySelector('.load-more button');
+                if (loadMoreBtn) {
+                    loadMoreBtn.style.display = destinationsToShow.length > 6 ? 'block' : 'none';
+                }
+                
+                console.log('Destinations displayed:', Math.min(6, destinationsToShow.length));
+            } else {
+                console.error('destination-list container not found');
+            }
+            
+            // Setup filter functionality
+            setupFilterTabs();
+        }
+        
+        function viewDestination(destinationName) {
+            window.location.href = `destination-detail.html?name=${encodeURIComponent(destinationName)}`;
+        }
+        
+        function setupFilterTabs() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active button
+                    filterBtns.forEach(b => {
+                        b.classList.remove('active', 'filter-btn-active');
+                        b.classList.add('filter-btn-inactive');
+                    });
+                    btn.classList.remove('filter-btn-inactive');
+                    btn.classList.add('active', 'filter-btn-active');
+                    
+                    // Filter destinations
+                    const filter = btn.dataset.filter;
+                    const destinationCards = document.querySelectorAll('.destination-card');
+                    destinationCards.forEach(card => {
+                        if (filter === 'all' || card.dataset.category === filter) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        }
+
+        function bookDestination(destinationName) {
+            if (!userManager.currentUser) {
+                userManager.showLogin();
+                return;
+            }
+
+            localStorage.setItem('selectedDestinationForGuideBooking', destinationName || '');
+            showNotification('Destination booking disabled. Please book a guide for this destination.', 'info');
+            window.location.href = 'guides.html?destination=' + encodeURIComponent(destinationName || '');
+        }
+        
+        function submitDestinationBooking(event, destinationName) {
+            event.preventDefault();
+            localStorage.setItem('selectedDestinationForGuideBooking', destinationName || '');
+            userManager.closeModal(event.target);
+            showNotification('Destination package booking is disabled. Please book a guide.', 'info');
+            window.location.href = 'guides.html?destination=' + encodeURIComponent(destinationName || '');
+        }
+        
+        function calculatePrice() {
+            const people = parseInt(document.querySelector('input[name="people"]')?.value || 1);
+            const packageType = document.querySelector('select[name="package"]')?.value || 'basic';
+            const packagePrices = { basic: 2000, premium: 3500, luxury: 5000 };
+            const basePrice = packagePrices[packageType];
+            const total = people * basePrice;
+            
+            const breakdown = document.getElementById('price-breakdown');
+            const totalPrice = document.getElementById('total-price');
+            
+            if (breakdown) breakdown.textContent = `${packageType.charAt(0).toUpperCase() + packageType.slice(1)} Package: ₹${basePrice} × ${people} people`;
+            if (totalPrice) totalPrice.textContent = `₹${total}`;
+        }
+        
+        function showPaymentModal(bookingData) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.innerHTML = `
+                <div class="modal-content payment-modal">
+                    <span class="close" onclick="userManager.closeModal(this)">&times;</span>
+                    <h2>Payment Details</h2>
+                    <div class="booking-summary">
+                        <h3>Booking Summary</h3>
+                        <p><strong>Destination:</strong> ${bookingData.destination}</p>
+                        <p><strong>Date:</strong> ${bookingData.date}</p>
+                        <p><strong>People:</strong> ${bookingData.people}</p>
+                        <p><strong>Package:</strong> ${bookingData.package.charAt(0).toUpperCase() + bookingData.package.slice(1)}</p>
+                        <p class="total-amount"><strong>Total Amount: ₹${bookingData.amount}</strong></p>
+                    </div>
+                    <form onsubmit="processPayment(event, ${JSON.stringify(bookingData).replace(/"/g, '&quot;')})">
+                        <div class="payment-methods">
+                            <h3>Select Payment Method</h3>
+                            <label><input type="radio" name="payment" value="card" checked> Credit/Debit Card</label>
+                            <label><input type="radio" name="payment" value="upi"> UPI</label>
+                            <label><input type="radio" name="payment" value="wallet"> Digital Wallet</label>
+                        </div>
+                        <div class="card-details">
+                            <div class="form-group">
+                                <label>Card Number</label>
+                                <input type="text" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div class="form-group">
+                                    <label>Expiry Date</label>
+                                    <input type="text" name="expiry" placeholder="MM/YY" maxlength="5">
+                                </div>
+                                <div class="form-group">
+                                    <label>CVV</label>
+                                    <input type="text" name="cvv" placeholder="123" maxlength="3">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Cardholder Name</label>
+                                <input type="text" name="cardName" placeholder="John Doe">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary payment-btn">Pay ₹${bookingData.amount}</button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function processPayment(event, bookingData) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            // Simulate payment processing
+            const paymentBtn = event.target.querySelector('.payment-btn');
+            paymentBtn.textContent = 'Processing...';
+            paymentBtn.disabled = true;
+            
+            setTimeout(() => {
+                const booking = {
+                    id: Date.now(),
+                    type: 'destination',
+                    destination: bookingData.destination,
+                    date: bookingData.date,
+                    people: bookingData.people,
+                    package: bookingData.package,
+                    requirements: bookingData.requirements,
+                    amount: bookingData.amount,
+                    paymentMethod: formData.get('payment'),
+                    paymentId: 'PAY' + Date.now(),
+                    status: 'confirmed',
+                    bookingDate: new Date().toISOString()
+                };
+                
+                if (userManager.currentUser) {
+                    userManager.currentUser.bookings = userManager.currentUser.bookings || [];
+                    userManager.currentUser.bookings.push(booking);
+                    localStorage.setItem('currentUser', JSON.stringify(userManager.currentUser));
+                    
+                    const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+                    const userIndex = allUsers.findIndex(u => u.id === userManager.currentUser.id);
+                    if (userIndex > -1) {
+                        allUsers[userIndex] = userManager.currentUser;
+                        localStorage.setItem('allUsers', JSON.stringify(allUsers));
+                    }
+                }
+                
+                userManager.closeModal(event.target);
+                showPaymentSuccess(booking);
+            }, 2000);
+        }
+        
+        function showPaymentSuccess(booking) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.innerHTML = `
+                <div class="modal-content success-modal">
+                    <div class="success-icon">✅</div>
+                    <h2>Payment Successful!</h2>
+                    <p>Your booking has been confirmed</p>
+                    <div class="booking-details">
+                        <p><strong>Booking ID:</strong> ${booking.id}</p>
+                        <p><strong>Payment ID:</strong> ${booking.paymentId}</p>
+                        <p><strong>Amount Paid:</strong> ₹${booking.amount}</p>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="downloadInvoice(${JSON.stringify(booking).replace(/"/g, '&quot;')})">Download Invoice</button>
+                        <button class="btn-secondary" onclick="sendConfirmationMessage(${JSON.stringify(booking).replace(/"/g, '&quot;')})">Send SMS</button>
+                        <button class="btn-secondary" onclick="userManager.closeModal(this)">Close</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function downloadInvoice(booking) {
+            const invoiceData = {
+                invoiceNumber: 'INV-' + booking.id,
+                date: new Date().toLocaleDateString(),
+                customerName: userManager.currentUser.name,
+                customerEmail: userManager.currentUser.email,
+                booking: booking
+            };
+            
+            const invoiceHTML = generateInvoiceHTML(invoiceData);
+            
+            // Create and download PDF-like HTML file
+            const blob = new Blob([invoiceHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `invoice-${booking.id}.html`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Invoice downloaded successfully!', 'success');
+        }
+        
+        function generateInvoiceHTML(data) {
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Invoice - ${data.invoiceNumber}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 40px; }
+                        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; }
+                        .invoice-details { margin: 20px 0; }
+                        .customer-details { background: #f5f5f5; padding: 15px; margin: 20px 0; }
+                        .booking-details { margin: 20px 0; }
+                        .total { font-size: 18px; font-weight: bold; text-align: right; margin-top: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                        th { background: #f5f5f5; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>TouristGuide</h1>
+                        <h2>INVOICE</h2>
+                    </div>
+                    <div class="invoice-details">
+                        <p><strong>Invoice Number:</strong> ${data.invoiceNumber}</p>
+                        <p><strong>Date:</strong> ${data.date}</p>
+                        <p><strong>Payment ID:</strong> ${data.booking.paymentId}</p>
+                    </div>
+                    <div class="customer-details">
+                        <h3>Customer Details</h3>
+                        <p><strong>Name:</strong> ${data.customerName}</p>
+                        <p><strong>Email:</strong> ${data.customerEmail}</p>
+                    </div>
+                    <div class="booking-details">
+                        <h3>Booking Details</h3>
+                        <table>
+                            <tr><th>Destination</th><td>${data.booking.destination}</td></tr>
+                            <tr><th>Travel Date</th><td>${data.booking.date}</td></tr>
+                            <tr><th>Number of People</th><td>${data.booking.people}</td></tr>
+                            <tr><th>Package Type</th><td>${data.booking.package.charAt(0).toUpperCase() + data.booking.package.slice(1)}</td></tr>
+                            <tr><th>Payment Method</th><td>${data.booking.paymentMethod.toUpperCase()}</td></tr>
+                        </table>
+                    </div>
+                    <div class="total">
+                        <p>Total Amount Paid: ₹${data.booking.amount}</p>
+                    </div>
+                    <div style="margin-top: 40px; text-align: center; color: #666;">
+                        <p>Thank you for choosing TouristGuide!</p>
+                        <p>For support, contact us at support@touristguide.com</p>
+                    </div>
+                </body>
+                </html>
+            `;
+        }
+        
+        function sendConfirmationMessage(booking) {
+            const message = `🎉 Booking Confirmed!\n\nDestination: ${booking.destination}\nDate: ${booking.date}\nPeople: ${booking.people}\nAmount: ₹${booking.amount}\nBooking ID: ${booking.id}\n\nThank you for choosing TouristGuide!`;
+            
+            // Simulate SMS sending
+            showNotification('Sending confirmation message...', 'info');
+            
+            setTimeout(() => {
+                // Store message in user's messages
+                if (userManager.currentUser) {
+                    userManager.currentUser.messages = userManager.currentUser.messages || [];
+                    userManager.currentUser.messages.push({
+                        id: Date.now(),
+                        type: 'booking_confirmation',
+                        message: message,
+                        date: new Date().toISOString(),
+                        read: false
+                    });
+                    localStorage.setItem('currentUser', JSON.stringify(userManager.currentUser));
+                }
+                
+                showNotification('Confirmation message sent successfully!', 'success');
+                
+                // Show message preview
+                const messageModal = document.createElement('div');
+                messageModal.className = 'modal-backdrop';
+                messageModal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close" onclick="userManager.closeModal(this)">&times;</span>
+                        <h2>Message Sent</h2>
+                        <div class="message-preview">
+                            <p><strong>SMS Preview:</strong></p>
+                            <div style="background: #f0f0f0; padding: 15px; border-radius: 8px; white-space: pre-line;">${message}</div>
+                        </div>
+                        <button class="btn-primary" onclick="userManager.closeModal(this)">Close</button>
+                    </div>
+                `;
+                document.body.appendChild(messageModal);
+            }, 1500);
+        }
+        
+        let currentDestinationIndex = 6;
+        
+        function loadMoreDestinations() {
+            const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]');
+            const fallbackData = [
+                {
+                    id: 1,
+                    name: "Taj Mahal",
+                    description: "Iconic white marble mausoleum and UNESCO World Heritage Site in Agra.",
+                    bestTime: "October to March",
+                    rating: 4.9,
+                    category: "cultural",
+                    imageUrl: "https://images.unsplash.com/photo-1548013146-72479768bada?w=400"
+                },
+                {
+                    id: 2,
+                    name: "Goa Beaches",
+                    description: "Beautiful beaches with Portuguese heritage and vibrant nightlife.",
+                    bestTime: "November to February",
+                    rating: 4.7,
+                    category: "beach",
+                    imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400"
+                },
+                {
+                    id: 3,
+                    name: "Kerala Backwaters",
+                    description: "Serene backwaters with houseboat cruises and lush greenery.",
+                    bestTime: "September to March",
+                    rating: 4.8,
+                    category: "nature",
+                    imageUrl: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400"
+                },
+                {
+                    id: 4,
+                    name: "Rajasthan Palaces",
+                    description: "Magnificent palaces and forts showcasing royal heritage.",
+                    bestTime: "October to March",
+                    rating: 4.8,
+                    category: "cultural",
+                    imageUrl: "https://images.unsplash.com/photo-1609920658906-8223bd289001?w=400"
+                },
+                {
+                    id: 5,
+                    name: "Himachal Pradesh",
+                    description: "Snow-capped mountains and scenic hill stations.",
+                    bestTime: "March to June",
+                    rating: 4.9,
+                    category: "mountain",
+                    imageUrl: "https://images.unsplash.com/photo-1605640840605-14ac1855827b?w=400"
+                },
+                {
+                    id: 6,
+                    name: "Mumbai City",
+                    description: "Bollywood capital and financial hub with vibrant culture.",
+                    bestTime: "November to February",
+                    rating: 4.5,
+                    category: "city",
+                    imageUrl: "https://images.unsplash.com/photo-1595658658481-d53d3f999875?w=400"
+                }
+            ];
+            
+            const allDestinations = savedDestinations.length > 0 ? savedDestinations : fallbackData;
+            
+            if (currentDestinationIndex >= allDestinations.length) {
+                showNotification('All destinations loaded!', 'info');
+                return;
+            }
+            
+            const container = document.getElementById('destination-list');
+            const nextBatch = allDestinations.slice(currentDestinationIndex, currentDestinationIndex + 3);
+            
+            nextBatch.forEach(destination => {
+                // Get image URL with better fallback logic
+                let imageUrl = destination.imageUrl || destination.image;
+                
+                // If no image URL, provide category-specific fallback
+                if (!imageUrl || imageUrl.trim() === '') {
+                    const categoryImages = {
+                        'cultural': 'https://images.unsplash.com/photo-1548013146-72479768bada?w=400',
+                        'beach': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
+                        'nature': 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400',
+                        'mountain': 'https://images.unsplash.com/photo-1605640840605-14ac1855827b?w=400',
+                        'city': 'https://images.unsplash.com/photo-1595658658481-d53d3f999875?w=400',
+                        'adventure': 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400'
+                    };
+                    imageUrl = categoryImages[destination.category] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400';
+                }
+                
+                const destinationCard = document.createElement('div');
+                destinationCard.className = 'destination-card';
+                destinationCard.setAttribute('data-category', destination.category);
+                destinationCard.onclick = () => viewDestination(destination.name);
+                destinationCard.innerHTML = `
+                    <img src="${imageUrl}" alt="${destination.name}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400'">
+                    <div class="card-content">
+                        <h3>${destination.name}</h3>
+                        <p class="description">${destination.description}</p>
+                        <p class="best-time"><i class="fas fa-calendar"></i> <strong>Best Time:</strong> ${destination.bestTime}</p>
+                        <div class="card-footer">
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>${destination.rating}/5</span>
+                            </div>
+                            <button class="book-btn" onclick="event.stopPropagation(); bookDestination('${destination.name}')">
+                                <i class="fas fa-bookmark"></i> Book Now
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(destinationCard);
+            });
+            
+            currentDestinationIndex += 3;
+            
+            if (currentDestinationIndex >= allDestinations.length) {
+                const loadMoreBtn = document.querySelector('.load-more button');
+                if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+            }
+        }
+        
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        function searchDestinations() {
+            const searchInput = document.getElementById('search-input');
+            const categoryFilter = document.getElementById('category-filter');
+            
+            if (!searchInput) return;
+            
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const category = categoryFilter ? categoryFilter.value : '';
+            
+            if (searchTerm || category) {
+                window.location.href = `destinations.html?search=${encodeURIComponent(searchTerm)}&category=${encodeURIComponent(category)}`;
+            }
+        }
+    </script>
+    <script>
+        function closeModal(element) {
+            const modal = element.closest('.modal-backdrop');
+            if (modal) {
+                modal.remove();
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+

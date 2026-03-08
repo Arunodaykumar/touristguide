@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - TouristGuide</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; }
+        
+        .admin-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .admin-login {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .admin-logo {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .admin-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .admin-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+        
+        .admin-header {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .admin-nav {
+            background: #2c3e50;
+            padding: 20px 0;
+        }
+        
+        .admin-nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .admin-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+        
+        .admin-nav a.active {
+            background: #34495e;
+        }
+        
+        .admin-content {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #3498db;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 2% auto;
+            padding: 0;
+            width: 95%;
+            max-width: 800px;
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px 15px 0 0;
+            position: relative;
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: white;
+            background: rgba(255,255,255,0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        
+        .close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .logout-btn {
+            width: auto;
+            padding: 8px 16px;
+        }
+        
+        .admin-header h1 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            color: #333;
+        }
+        
+        .admin-header h1 i {
+            color: #667eea;
+            font-size: 28px;
+        }
+        
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Form -->
+    <div id="login-container" class="admin-container">
+        <div class="admin-login">
+            <div class="admin-logo">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h1 class="admin-title">Admin Login</h1>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="admin-btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard">
+        <header class="admin-header">
+            <h1>🗺️ TouristGuide Admin</h1>
+            <button id="logout-btn" class="admin-btn logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </header>
+
+        <nav class="admin-nav">
+            <ul>
+                <li><a href="#" class="nav-link active" data-section="overview">Overview</a></li>
+                <li><a href="#" class="nav-link" data-section="destinations">Destinations</a></li>
+                <li><a href="#" class="nav-link" data-section="guides">Guides</a></li>
+                <li><a href="#" class="nav-link" data-section="users">Users</a></li>
+                <li><a href="#" class="nav-link" data-section="bookings">Bookings</a></li>
+                <li><a href="#" class="nav-link" data-section="analytics">Analytics</a></li>
+                <li><a href="#" class="nav-link" data-section="settings">Settings</a></li>
+            </ul>
+        </nav>
+
+        <main class="admin-content">
+            <!-- Overview Section -->
+            <section id="overview" class="section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="stat-number" id="total-destinations">10</div>
+                        <div>Total Destinations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-number" id="total-users">0</div>
+                        <div>Registered Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-number" id="total-bookings">0</div>
+                        <div>Active Bookings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="stat-number" id="total-guides">0</div>
+                        <div>Active Guides</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Destinations Section -->
+            <section id="destinations" class="section">
+                <h2>Manage Destinations</h2>
+                <button onclick="addDestination()" style="background:#27ae60; color:white; border:none; padding:10px 20px; border-radius:5px; margin:10px 0; cursor:pointer;">Add Destination</button>
+                <div id="destinations-table">Loading destinations...</div>
+            </section>
+
+            <!-- Guides Section -->
+            <section id="guides" class="section">
+                <h2>Manage Guides</h2>
+                <div id="guides-table">Loading guides...</div>
+            </section>
+
+            <!-- Users Section -->
+            <section id="users" class="section">
+                <h2>Manage Users</h2>
+                <button onclick="exportUsers()" style="background:#f39c12; color:white; border:none; padding:10px 20px; border-radius:5px; margin:10px 0; cursor:pointer;">Export Users</button>
+                <div id="users-table">Loading users...</div>
+            </section>
+
+            <!-- Bookings Section -->
+            <section id="bookings" class="section">
+                <h2>Manage Bookings</h2>
+                <div id="bookings-table">Loading bookings...</div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics" class="section">
+                <h2>Analytics Dashboard</h2>
+                <div style="padding:20px; background:white; border-radius:10px; margin:20px 0;">
+                    <h3>Monthly Revenue: ₹1,25,000</h3>
+                    <p>Popular destinations, user growth, and booking trends...</p>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="section">
+                <h2>System Settings</h2>
+                
+                <!-- Site Configuration -->
+                <div style="padding:30px; background:white; border-radius:10px; margin:20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="margin-bottom:20px; color:#333;"><i class="fas fa-cog"></i> Site Configuration</h3>
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block; margin-bottom:8px; font-weight:600;">Site Name:</label>
+                        <input type="text" id="site-name-input" value="TouristGuide" style="width:100%; max-width:400px; padding:10px; border:2px solid #e1e5e9; border-radius:8px; font-size:16px;">
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block; margin-bottom:8px; font-weight:600;">Upload Logo:</label>
+                        <input type="file" id="logo-upload" accept="image/*" style="padding:10px; border:2px solid #e1e5e9; border-radius:8px;">
+                        <div id="logo-preview" style="margin-top:15px; min-height:80px; border:2px dashed #ddd; border-radius:8px; padding:20px; text-align:center; background:#f8f9fa;">Current logo will appear here</div>
+                    </div>
+                    <button onclick="saveSettings()" style="background:#667eea; color:white; border:none; padding:12px 30px; border-radius:8px; cursor:pointer; font-size:16px; font-weight:600;"><i class="fas fa-save"></i> Save Settings</button>
+                </div>
+                
+                <!-- Email Configuration -->
+                <div style="padding:30px; background:white; border-radius:10px; margin:20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="margin-bottom:20px; color:#333;"><i class="fas fa-envelope"></i> Email Configuration</h3>
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block; margin-bottom:8px; font-weight:600;">Contact Email:</label>
+                        <input type="email" id="contact-email" value="info@touristguide.com" style="width:100%; max-width:400px; padding:10px; border:2px solid #e1e5e9; border-radius:8px;">
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block; margin-bottom:8px; font-weight:600;">Support Email:</label>
+                        <input type="email" id="support-email" value="support@touristguide.com" style="width:100%; max-width:400px; padding:10px; border:2px solid #e1e5e9; border-radius:8px;">
+                    </div>
+                    <button onclick="saveEmailSettings()" style="background:#27ae60; color:white; border:none; padding:12px 30px; border-radius:8px; cursor:pointer; font-size:16px; font-weight:600;"><i class="fas fa-save"></i> Save Email Settings</button>
+                </div>
+                
+                <!-- Payment Configuration -->
+                <div style="padding:30px; background:white; border-radius:10px; margin:20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="margin-bottom:20px; color:#333;"><i class="fas fa-credit-card"></i> Payment Configuration</h3>
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block; margin-bottom:8px; font-weight:600;">Currency:</label>
+                        <select id="currency" style="width:100%; max-width:400px; padding:10px; border:2px solid #e1e5e9; border-radius:8px;">
+                            <option value="INR">INR (₹)</option>
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block; margin-bottom:8px; font-weight:600;">Tax Rate (%):</label>
+                        <input type="number" id="tax-rate" value="18" min="0" max="100" style="width:100%; max-width:400px; padding:10px; border:2px solid #e1e5e9; border-radius:8px;">
+                    </div>
+                    <button onclick="savePaymentSettings()" style="background:#f39c12; color:white; border:none; padding:12px 30px; border-radius:8px; cursor:pointer; font-size:16px; font-weight:600;"><i class="fas fa-save"></i> Save Payment Settings</button>
+                </div>
+                
+                <!-- Data Management -->
+                <div style="padding:30px; background:white; border-radius:10px; margin:20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="margin-bottom:20px; color:#333;"><i class="fas fa-database"></i> Data Management</h3>
+                    <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                        <button onclick="exportAllData()" style="background:#3498db; color:white; border:none; padding:12px 24px; border-radius:8px; cursor:pointer; font-weight:600;"><i class="fas fa-download"></i> Export All Data</button>
+                        <button onclick="importData()" style="background:#9b59b6; color:white; border:none; padding:12px 24px; border-radius:8px; cursor:pointer; font-weight:600;"><i class="fas fa-upload"></i> Import Data</button>
+                        <button onclick="clearAllData()" style="background:#e74c3c; color:white; border:none; padding:12px 24px; border-radius:8px; cursor:pointer; font-weight:600;"><i class="fas fa-trash"></i> Clear All Data</button>
+                    </div>
+                </div>
+                
+                <!-- System Info -->
+                <div style="padding:30px; background:white; border-radius:10px; margin:20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="margin-bottom:20px; color:#333;"><i class="fas fa-info-circle"></i> System Information</h3>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:15px;">
+                        <div style="padding:15px; background:#f8f9fa; border-radius:8px;">
+                            <strong>Version:</strong> 1.0.0
+                        </div>
+                        <div style="padding:15px; background:#f8f9fa; border-radius:8px;">
+                            <strong>Last Updated:</strong> <span id="last-updated">-</span>
+                        </div>
+                        <div style="padding:15px; background:#f8f9fa; border-radius:8px;">
+                            <strong>Total Storage:</strong> <span id="storage-used">-</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Edit Destination Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 style="margin: 0; font-size: 24px;"><i class="fas fa-edit"></i> Edit Destination</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="edit-form">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label><i class="fas fa-map-marker-alt"></i> Name:</label>
+                            <input type="text" id="edit-name" required placeholder="Enter destination name">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-globe"></i> Country:</label>
+                            <input type="text" id="edit-country" required placeholder="Enter country">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label><i class="fas fa-tags"></i> Category:</label>
+                            <select id="edit-category" required>
+                                <option value="">Select Category</option>
+                                <option value="beach">🏖️ Beach</option>
+                                <option value="mountain">🏔️ Mountain</option>
+                                <option value="cultural">🏛️ Cultural</option>
+                                <option value="nature">🌿 Nature</option>
+                                <option value="city">🏙️ City</option>
+                                <option value="adventure">🎯 Adventure</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-star"></i> Rating:</label>
+                            <input type="number" id="edit-rating" min="1" max="5" step="0.1" required placeholder="4.5">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-align-left"></i> Description:</label>
+                        <textarea id="edit-description" rows="4" placeholder="Enter detailed description of the destination..."></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Best Time to Visit:</label>
+                            <input type="text" id="edit-best-time" placeholder="e.g., October to March">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-rupee-sign"></i> Price (₹):</label>
+                            <input type="number" id="edit-price" min="0" placeholder="Starting price">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label><i class="fas fa-upload"></i> Upload Image:</label>
+                            <input type="file" id="edit-image" accept="image/*" onchange="previewImage()" style="padding: 10px; background: #f8f9fa;">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-link"></i> Or Image URL:</label>
+                            <input type="url" id="edit-image-url" placeholder="https://example.com/image.jpg">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-image"></i> Image Preview:</label>
+                        <div id="image-preview" style="min-height: 100px; border: 2px dashed #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #f8f9fa;">No image selected</div>
+                    </div>
+                    <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                        <button type="button" onclick="closeModal()" style="background:#6c757d; color:white; border:none; padding:12px 24px; border-radius:8px; cursor:pointer; font-weight: 600; transition: background 0.3s;">Cancel</button>
+                        <button type="submit" style="background:linear-gradient(135deg, #28a745, #20c997); color:white; border:none; padding:12px 24px; border-radius:8px; cursor:pointer; font-weight: 600; transition: transform 0.2s;">💾 Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="remote-sync.js?v=3"></script>
+    <script>
+        // Login functionality
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === 'admin' && password === 'admin123') {
+                localStorage.setItem('authToken', 'admin-token');
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                loadData();
+            } else {
+                alert('Invalid credentials! Use: admin / admin123');
+            }
+        });
+
+        // Check if already logged in
+        if (localStorage.getItem('authToken')) {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            loadData();
+        }
+
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('authToken');
+            window.location.href = 'index.html';
+        });
+
+        // Navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                
+                this.classList.add('active');
+                const sectionId = this.dataset.section;
+                document.getElementById(sectionId).classList.add('active');
+                
+                // Reload data when switching sections
+                if (sectionId === 'overview' || sectionId === 'destinations' || sectionId === 'users' || sectionId === 'guides' || sectionId === 'bookings') {
+                    loadData();
+                }
+            });
+        });
+
+        function getDefaultDestinations() {
+            return [
+                { id: 1, name: "Taj Mahal", country: "India", category: "cultural", rating: 4.9 },
+                { id: 2, name: "Goa Beaches", country: "India", category: "beach", rating: 4.7 },
+                { id: 3, name: "Kerala Backwaters", country: "India", category: "nature", rating: 4.8 },
+                { id: 4, name: "Rajasthan Palaces", country: "India", category: "cultural", rating: 4.8 },
+                { id: 5, name: "Himachal Pradesh", country: "India", category: "mountain", rating: 4.9 }
+            ];
+        }
+
+        function getDefaultDestinationNameSet() {
+            return new Set(
+                getDefaultDestinations().map(dest => String(dest.name || '').toLowerCase())
+            );
+        }
+
+        function getDeletedDefaultDestinationNameSet() {
+            try {
+                const list = JSON.parse(localStorage.getItem('deletedDefaultDestinations') || '[]');
+                return new Set(list.map(name => String(name || '').toLowerCase()));
+            } catch (error) {
+                return new Set();
+            }
+        }
+
+        function saveDeletedDefaultDestinationNameSet(nameSet) {
+            localStorage.setItem('deletedDefaultDestinations', JSON.stringify(Array.from(nameSet)));
+        }
+
+        function isDefaultDestination(dest) {
+            if (!dest) return false;
+            const name = String(dest.name || '').toLowerCase();
+            return Boolean(dest.isDefault) || getDefaultDestinationNameSet().has(name);
+        }
+
+        // Load data
+        function loadData() {
+            // Load saved logo and site name
+            const savedLogo = localStorage.getItem('siteLogo');
+            const savedName = localStorage.getItem('siteName') || 'TouristGuide';
+            
+            // Update admin header with saved logo
+            const headerTitle = document.querySelector('.admin-header h1');
+            if (savedLogo) {
+                headerTitle.innerHTML = `<img src="${savedLogo}" style="width: 30px; height: 30px; object-fit: contain; margin-right: 10px;"> ${savedName} Admin`;
+            } else {
+                headerTitle.innerHTML = `🗺️ ${savedName} Admin`;
+            }
+            
+            // Update settings page inputs
+            const siteNameInput = document.getElementById('site-name-input');
+            if (siteNameInput) {
+                siteNameInput.value = savedName;
+            }
+            
+            const logoPreview = document.getElementById('logo-preview');
+            if (logoPreview && savedLogo) {
+                logoPreview.innerHTML = `<img src="${savedLogo}" style="max-width:200px; max-height:80px; object-fit:contain;">`;
+            }
+            
+            // Load email settings
+            const contactEmail = localStorage.getItem('contactEmail');
+            const supportEmail = localStorage.getItem('supportEmail');
+            if (contactEmail && document.getElementById('contact-email')) {
+                document.getElementById('contact-email').value = contactEmail;
+            }
+            if (supportEmail && document.getElementById('support-email')) {
+                document.getElementById('support-email').value = supportEmail;
+            }
+            
+            // Load payment settings
+            const currency = localStorage.getItem('currency');
+            const taxRate = localStorage.getItem('taxRate');
+            if (currency && document.getElementById('currency')) {
+                document.getElementById('currency').value = currency;
+            }
+            if (taxRate && document.getElementById('tax-rate')) {
+                document.getElementById('tax-rate').value = taxRate;
+            }
+            
+            // Update system info
+            updateSystemInfo();
+            
+            const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            const guides = allUsers.filter(user => user.role === 'guide');
+            const userBookings = allUsers.flatMap(user => user.bookings || []);
+            
+            const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]');
+            const deletedDefaultNames = getDeletedDefaultDestinationNameSet();
+            const visibleDefaults = getDefaultDestinations().filter(
+                dest => !deletedDefaultNames.has(String(dest.name || '').toLowerCase())
+            );
+            const allDestinations = [...visibleDefaults, ...savedDestinations]
+                .filter((dest, index, self) => index === self.findIndex(d => d.name === dest.name));
+            
+            document.getElementById('total-users').textContent = allUsers.length;
+            document.getElementById('total-guides').textContent = guides.length;
+            document.getElementById('total-bookings').textContent = userBookings.length;
+            document.getElementById('total-destinations').textContent = allDestinations.length;
+            
+            // Load users table
+            const usersTable = document.getElementById('users-table');
+            if (allUsers.length > 0) {
+                usersTable.innerHTML = '<table style="width:100%; border-collapse: collapse; background:white; border-radius:10px; overflow:hidden;"><tr style="background:#f8f9fa;"><th style="padding:15px; border:1px solid #ddd;">Name</th><th style="padding:15px; border:1px solid #ddd;">Email</th><th style="padding:15px; border:1px solid #ddd;">Phone</th><th style="padding:15px; border:1px solid #ddd;">Role</th><th style="padding:15px; border:1px solid #ddd;">Actions</th></tr>' + 
+                allUsers.map(user => `<tr><td style="padding:15px; border:1px solid #ddd;">${user.name}</td><td style="padding:15px; border:1px solid #ddd;">${user.email}</td><td style="padding:15px; border:1px solid #ddd;">${user.phone || 'N/A'}</td><td style="padding:15px; border:1px solid #ddd;"><span style="background:${user.role === 'guide' ? '#3498db' : '#95a5a6'}; color:white; padding:4px 8px; border-radius:4px; font-size:12px;">${user.role || 'user'}</span></td><td style="padding:15px; border:1px solid #ddd;"><button onclick="deleteUser(${user.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">Delete</button></td></tr>`).join('') + '</table>';
+            } else {
+                usersTable.innerHTML = '<div style="background:white; padding:20px; border-radius:10px;">No users found</div>';
+            }
+            
+            // Load guides table
+            const guidesTable = document.getElementById('guides-table');
+            if (guides.length > 0) {
+                guidesTable.innerHTML = '<table style="width:100%; border-collapse: collapse; background:white; border-radius:10px; overflow:hidden;"><tr style="background:#f8f9fa;"><th style="padding:15px; border:1px solid #ddd;">Name</th><th style="padding:15px; border:1px solid #ddd;">Destination</th><th style="padding:15px; border:1px solid #ddd;">Expertise</th><th style="padding:15px; border:1px solid #ddd;">Rate</th></tr>' + 
+                guides.map(guide => `<tr><td style="padding:15px; border:1px solid #ddd;">${guide.name}</td><td style="padding:15px; border:1px solid #ddd;">${guide.destination || guide.location || 'India'}</td><td style="padding:15px; border:1px solid #ddd;">${guide.expertise || 'General Tours'}</td><td style="padding:15px; border:1px solid #ddd;">₹${guide.rate || 100}/hr</td></tr>`).join('') + '</table>';
+            } else {
+                guidesTable.innerHTML = '<div style="background:white; padding:20px; border-radius:10px;">No guides found</div>';
+            }
+            
+            // Load bookings table
+            const bookingsTable = document.getElementById('bookings-table');
+            if (userBookings.length > 0) {
+                bookingsTable.innerHTML = '<table style="width:100%; border-collapse: collapse; background:white; border-radius:10px; overflow:hidden;"><tr style="background:#f8f9fa;"><th style="padding:15px; border:1px solid #ddd;">Service</th><th style="padding:15px; border:1px solid #ddd;">Date</th><th style="padding:15px; border:1px solid #ddd;">Amount</th><th style="padding:15px; border:1px solid #ddd;">Status</th></tr>' + 
+                userBookings.map(booking => `<tr><td style="padding:15px; border:1px solid #ddd;">${booking.guide || booking.destination || 'N/A'}</td><td style="padding:15px; border:1px solid #ddd;">${booking.date || 'N/A'}</td><td style="padding:15px; border:1px solid #ddd;">₹${booking.amount || 0}</td><td style="padding:15px; border:1px solid #ddd;"><span style="background:#27ae60; color:white; padding:4px 8px; border-radius:4px; font-size:12px;">${booking.status || 'Confirmed'}</span></td></tr>`).join('') + '</table>';
+            } else {
+                bookingsTable.innerHTML = '<div style="background:white; padding:20px; border-radius:10px;">No bookings found</div>';
+            }
+            
+            // Load destinations table
+            const destinationsTable = document.getElementById('destinations-table');
+            if (allDestinations.length > 0) {
+                destinationsTable.innerHTML = '<table style="width:100%; border-collapse: collapse; background:white; border-radius:10px; overflow:hidden;"><tr style="background:#f8f9fa;"><th style="padding:15px; border:1px solid #ddd;">Name</th><th style="padding:15px; border:1px solid #ddd;">Country</th><th style="padding:15px; border:1px solid #ddd;">Category</th><th style="padding:15px; border:1px solid #ddd;">Rating</th><th style="padding:15px; border:1px solid #ddd;">Actions</th></tr>' + 
+                allDestinations.map(dest => `<tr><td style="padding:15px; border:1px solid #ddd;">${dest.name}</td><td style="padding:15px; border:1px solid #ddd;">${dest.country || 'India'}</td><td style="padding:15px; border:1px solid #ddd;">${dest.category}</td><td style="padding:15px; border:1px solid #ddd;">${dest.rating} /5</td><td style="padding:15px; border:1px solid #ddd;"><button onclick='editDestination("${encodeURIComponent(dest.name)}")' style="background:#3498db; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer; margin-right:5px;">Edit</button><button onclick='deleteDestination("${encodeURIComponent(dest.name)}")' style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">Delete</button></td></tr>`).join('') + '</table>';
+            } else {
+                destinationsTable.innerHTML = '<div style="background:white; padding:20px; border-radius:10px;">No destinations found</div>';
+            }
+        }
+        
+        // Admin functions
+        function deleteUser(id) {
+            if (confirm('Delete this user?')) {
+                const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+                const updatedUsers = allUsers.filter(u => u.id != id);
+                localStorage.setItem('allUsers', JSON.stringify(updatedUsers));
+                loadData();
+                alert('User deleted successfully!');
+            }
+        }
+        
+        function exportUsers() {
+            const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            if (allUsers.length === 0) {
+                alert('No users to export!');
+                return;
+            }
+            const csv = 'Name,Email,Role\n' + allUsers.map(u => `${u.name || 'N/A'},${u.email || 'N/A'},${u.role || 'user'}`).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `users-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            alert('Users exported successfully!');
+        }
+        
+        function addDestination() {
+            const name = prompt('Destination name:');
+            if (!name || name.trim() === '') return;
+            
+            const country = prompt('Country:') || 'India';
+            const category = prompt('Category (beach/mountain/cultural/nature/city):') || 'cultural';
+            const rating = parseFloat(prompt('Rating (1-5):') || '4.5');
+            
+            if (rating < 1 || rating > 5) {
+                alert('Rating must be between 1 and 5!');
+                return;
+            }
+            
+            const newDest = {
+                id: Date.now(),
+                name: name.trim(),
+                country: country.trim(),
+                category: category.toLowerCase().trim(),
+                rating: rating,
+                description: '',
+                bestTime: '',
+                price: 0,
+                imageUrl: (() => {
+                    const categoryImages = {
+                        'cultural': 'https://images.unsplash.com/photo-1548013146-72479768bada?w=400',
+                        'beach': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
+                        'nature': 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400',
+                        'mountain': 'https://images.unsplash.com/photo-1605640840605-14ac1855827b?w=400',
+                        'city': 'https://images.unsplash.com/photo-1595658658481-d53d3f999875?w=400',
+                        'adventure': 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400'
+                    };
+                    return categoryImages[category.toLowerCase().trim()] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400';
+                })()
+            };
+            
+            const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]');
+            
+            // Check for duplicate names against currently visible destinations only
+            const deletedDefaultNames = getDeletedDefaultDestinationNameSet();
+            const visibleDefaults = getDefaultDestinations().filter(
+                dest => !deletedDefaultNames.has(String(dest.name || '').toLowerCase())
+            );
+            const existingVisibleNames = new Set([
+                ...savedDestinations.map(d => String(d.name || '').toLowerCase()),
+                ...visibleDefaults.map(d => String(d.name || '').toLowerCase())
+            ]);
+            if (existingVisibleNames.has(newDest.name.toLowerCase())) {
+                alert('Destination with this name already exists!');
+                return;
+            }
+            
+            savedDestinations.push(newDest);
+            localStorage.setItem('destinations', JSON.stringify(savedDestinations));
+            
+            // Dispatch custom event for same-tab updates
+            window.dispatchEvent(new CustomEvent('destinationsUpdated'));
+            
+            // Dispatch storage event to notify other pages
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: 'destinations',
+                newValue: JSON.stringify(savedDestinations)
+            }));
+            
+            alert('Destination "' + name + '" added successfully!');
+            loadData();
+        }
+        
+        let currentEditingDest = null;
+        
+        function editDestination(encodedName) {
+            const name = decodeURIComponent(encodedName || '');
+            const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]');
+            let dest = savedDestinations.find(d => d.name === name);
+            
+            // If not found in saved, check fallback destinations
+            if (!dest) {
+                dest = getDefaultDestinations().find(d => d.name === name);
+                
+                if (dest) {
+                    // Keep default destination protected even after editing.
+                    dest = { ...dest, isDefault: true };
+                    const existingIndex = savedDestinations.findIndex(
+                        d => String(d.name || '').toLowerCase() === String(dest.name || '').toLowerCase()
+                    );
+                    if (existingIndex !== -1) {
+                        savedDestinations[existingIndex] = { ...savedDestinations[existingIndex], ...dest };
+                    } else {
+                        savedDestinations.push(dest);
+                    }
+                    localStorage.setItem('destinations', JSON.stringify(savedDestinations));
+                }
+            }
+            
+            if (dest) {
+                currentEditingDest = dest;
+                document.getElementById('edit-name').value = dest.name || '';
+                document.getElementById('edit-country').value = dest.country || '';
+                document.getElementById('edit-category').value = dest.category || '';
+                document.getElementById('edit-rating').value = dest.rating || '';
+                document.getElementById('edit-description').value = dest.description || '';
+                document.getElementById('edit-best-time').value = dest.bestTime || '';
+                document.getElementById('edit-price').value = dest.price || '';
+                document.getElementById('edit-image-url').value = dest.imageUrl || '';
+                
+                // Show current image if exists
+                const preview = document.getElementById('image-preview');
+                if (dest.imageUrl) {
+                    preview.innerHTML = `<img src="${dest.imageUrl}" style="max-width:100%; max-height:200px; border-radius:8px; object-fit:cover;">`;
+                } else {
+                    preview.innerHTML = 'No image selected';
+                }
+                
+                document.getElementById('edit-modal').style.display = 'block';
+            } else {
+                alert('Destination not found!');
+            }
+        }
+        
+        function previewImage() {
+            const file = document.getElementById('edit-image').files[0];
+            const preview = document.getElementById('image-preview');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" style="max-width:100%; max-height:200px; border-radius:8px; object-fit:cover;">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = 'No image selected';
+            }
+        }
+
+        function compressImageFile(file, maxWidth = 1280, quality = 0.72) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > maxWidth) {
+                            const ratio = maxWidth / width;
+                            width = maxWidth;
+                            height = Math.round(height * ratio);
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function closeModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+            document.getElementById('image-preview').innerHTML = '';
+            document.getElementById('edit-form').reset();
+            currentEditingDest = null;
+        }
+        
+        document.getElementById('edit-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (currentEditingDest) {
+                const imageFile = document.getElementById('edit-image').files[0];
+                const imageUrl = document.getElementById('edit-image-url').value;
+                
+                // Update destination data
+                currentEditingDest.name = document.getElementById('edit-name').value;
+                currentEditingDest.country = document.getElementById('edit-country').value;
+                currentEditingDest.category = document.getElementById('edit-category').value;
+                currentEditingDest.rating = parseFloat(document.getElementById('edit-rating').value);
+                currentEditingDest.description = document.getElementById('edit-description').value;
+                currentEditingDest.bestTime = document.getElementById('edit-best-time').value;
+                currentEditingDest.price = parseInt(document.getElementById('edit-price').value) || 0;
+                
+                if (imageFile) {
+                    compressImageFile(imageFile).then((compressedDataUrl) => {
+                        currentEditingDest.imageUrl = compressedDataUrl;
+
+                        // Save to localStorage immediately
+                        const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]');
+                        const index = savedDestinations.findIndex(d => d.id === currentEditingDest.id || d.name === currentEditingDest.name);
+                        if (index !== -1) {
+                            savedDestinations[index] = currentEditingDest;
+                        } else {
+                            savedDestinations.push(currentEditingDest);
+                        }
+                        localStorage.setItem('destinations', JSON.stringify(savedDestinations));
+
+                        // Dispatch custom event for same-tab updates
+                        window.dispatchEvent(new CustomEvent('destinationsUpdated'));
+
+                        window.dispatchEvent(new StorageEvent('storage', {
+                            key: 'destinations',
+                            newValue: JSON.stringify(savedDestinations)
+                        }));
+
+                        closeModal();
+                        loadData();
+                        alert('Destination updated successfully!');
+                    }).catch(() => {
+                        alert('Image processing failed. Please try a smaller image.');
+                    });
+                } else {
+                    if (imageUrl) {
+                        currentEditingDest.imageUrl = imageUrl;
+                    } else if (!currentEditingDest.imageUrl) {
+                        // Set default image based on category if no image provided
+                        const categoryImages = {
+                            'cultural': 'https://images.unsplash.com/photo-1548013146-72479768bada?w=400',
+                            'beach': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
+                            'nature': 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400',
+                            'mountain': 'https://images.unsplash.com/photo-1605640840605-14ac1855827b?w=400',
+                            'city': 'https://images.unsplash.com/photo-1595658658481-d53d3f999875?w=400',
+                            'adventure': 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400'
+                        };
+                        currentEditingDest.imageUrl = categoryImages[currentEditingDest.category] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400';
+                    }
+                    
+                    // Save to localStorage
+                    const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]');
+                    const index = savedDestinations.findIndex(d => d.id === currentEditingDest.id || d.name === currentEditingDest.name);
+                    if (index !== -1) {
+                        savedDestinations[index] = currentEditingDest;
+                    } else {
+                        savedDestinations.push(currentEditingDest);
+                    }
+                    localStorage.setItem('destinations', JSON.stringify(savedDestinations));
+                    
+                    // Dispatch custom event for same-tab updates
+                    window.dispatchEvent(new CustomEvent('destinationsUpdated'));
+                    
+                    window.dispatchEvent(new StorageEvent('storage', {
+                        key: 'destinations',
+                        newValue: JSON.stringify(savedDestinations)
+                    }));
+                    
+                    closeModal();
+                    loadData();
+                    alert('Destination updated successfully!');
+                }
+            }
+        });
+        
+
+        
+
+        
+        function deleteDestination(encodedName) {
+            const name = decodeURIComponent(encodedName || '');
+            if (confirm('Delete this destination?')) {
+                const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]');
+                const targetName = String(name || '').toLowerCase();
+                const updatedDestinations = savedDestinations.filter(
+                    d => String(d.name || '').toLowerCase() !== targetName
+                );
+                localStorage.setItem('destinations', JSON.stringify(updatedDestinations));
+
+                // Persist default destination deletion by name.
+                if (getDefaultDestinationNameSet().has(targetName)) {
+                    const deletedDefaultNames = getDeletedDefaultDestinationNameSet();
+                    deletedDefaultNames.add(targetName);
+                    saveDeletedDefaultDestinationNameSet(deletedDefaultNames);
+                }
+                
+                // Dispatch custom event for same-tab updates
+                window.dispatchEvent(new CustomEvent('destinationsUpdated'));
+                
+                // Dispatch storage event to notify other pages
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: 'destinations',
+                    newValue: JSON.stringify(updatedDestinations)
+                }));
+                
+                alert('Destination deleted!');
+                loadData();
+            }
+        }
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('edit-modal');
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        function saveSettings() {
+            const siteName = document.getElementById('site-name-input').value;
+            const logoFile = document.getElementById('logo-upload').files[0];
+            
+            if (siteName) {
+                localStorage.setItem('siteName', siteName);
+            }
+            
+            if (logoFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    localStorage.setItem('siteLogo', e.target.result);
+                    localStorage.setItem('lastUpdated', new Date().toLocaleString());
+                    document.getElementById('logo-preview').innerHTML = `<img src="${e.target.result}" style="max-width:200px; max-height:80px; object-fit:contain;">`;
+                    alert('Settings saved successfully! Logo and site name updated.');
+                    loadData();
+                };
+                reader.readAsDataURL(logoFile);
+            } else {
+                localStorage.setItem('lastUpdated', new Date().toLocaleString());
+                alert('Settings saved successfully!');
+                loadData();
+            }
+        }
+        
+        function saveEmailSettings() {
+            const contactEmail = document.getElementById('contact-email').value;
+            const supportEmail = document.getElementById('support-email').value;
+            localStorage.setItem('contactEmail', contactEmail);
+            localStorage.setItem('supportEmail', supportEmail);
+            localStorage.setItem('lastUpdated', new Date().toLocaleString());
+            alert('Email settings saved successfully!');
+            updateSystemInfo();
+        }
+        
+        function savePaymentSettings() {
+            const currency = document.getElementById('currency').value;
+            const taxRate = document.getElementById('tax-rate').value;
+            localStorage.setItem('currency', currency);
+            localStorage.setItem('taxRate', taxRate);
+            localStorage.setItem('lastUpdated', new Date().toLocaleString());
+            alert('Payment settings saved successfully!');
+            updateSystemInfo();
+        }
+        
+        function exportAllData() {
+            const data = {
+                destinations: JSON.parse(localStorage.getItem('destinations') || '[]'),
+                users: JSON.parse(localStorage.getItem('allUsers') || '[]'),
+                settings: {
+                    siteName: localStorage.getItem('siteName'),
+                    contactEmail: localStorage.getItem('contactEmail'),
+                    supportEmail: localStorage.getItem('supportEmail'),
+                    currency: localStorage.getItem('currency'),
+                    taxRate: localStorage.getItem('taxRate')
+                }
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `touristguide-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            alert('Data exported successfully!');
+        }
+        
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        if (data.destinations) localStorage.setItem('destinations', JSON.stringify(data.destinations));
+                        if (data.users) localStorage.setItem('allUsers', JSON.stringify(data.users));
+                        if (data.settings) {
+                            Object.keys(data.settings).forEach(key => {
+                                if (data.settings[key]) localStorage.setItem(key, data.settings[key]);
+                            });
+                        }
+                        alert('Data imported successfully!');
+                        loadData();
+                    } catch (err) {
+                        alert('Error importing data: Invalid file format');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+        
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone!')) {
+                if (confirm('This will delete all destinations, users, and bookings. Continue?')) {
+                    localStorage.removeItem('destinations');
+                    localStorage.removeItem('allUsers');
+                    localStorage.removeItem('currentUser');
+                    alert('All data cleared successfully!');
+                    loadData();
+                }
+            }
+        }
+        
+        function updateSystemInfo() {
+            const lastUpdated = localStorage.getItem('lastUpdated') || 'Never';
+            document.getElementById('last-updated').textContent = lastUpdated;
+            
+            let totalSize = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    totalSize += localStorage[key].length + key.length;
+                }
+            }
+            document.getElementById('storage-used').textContent = (totalSize / 1024).toFixed(2) + ' KB';
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destinations - Tourist Guide</title>
+    <link rel="stylesheet" href="styles-new.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>TouristGuide</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="destinations.html" class="nav-link">Destinations</a></li>
+                <li><a href="guides.html" class="nav-link">Guides</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+                <li><a href="admin.html" class="nav-link admin-link"><i class="fas fa-shield-alt"></i> Admin</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button onclick="userManager.showLogin()" class="btn-login">Login</button>
+                <button onclick="userManager.showRegister()" class="btn-register">Register</button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="destinations" style="padding-top: 100px;">
+        <div class="container">
+            <div class="section-header">
+                <h2>All Destinations</h2>
+                <p>Explore amazing places around the world</p>
+            </div>
+            
+            <div class="search-box" style="margin-bottom: 30px;">
+                <input type="text" id="search-input" placeholder="Search destinations...">
+                <select id="category-filter">
+                    <option value="">All Categories</option>
+                    <option value="beach">Beach</option>
+                    <option value="mountain">Mountain</option>
+                    <option value="city">City</option>
+                    <option value="cultural">Cultural</option>
+                    <option value="nature">Nature</option>
+                </select>
+                <button onclick="searchDestinations()" class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <div class="filter-tabs">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="beach">Beach</button>
+                <button class="filter-btn" data-filter="mountain">Mountain</button>
+                <button class="filter-btn" data-filter="city">City</button>
+                <button class="filter-btn" data-filter="cultural">Cultural</button>
+                <button class="filter-btn" data-filter="nature">Nature</button>
+            </div>
+
+            <div id="destination-list" class="destination-grid">
+                <!-- Destinations will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <script src="remote-sync.js?v=3"></script>
+    <script src="user-manager.js"></script>
+    <script src="logo-global.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshAuthUI();
+            updateLogoOnPage();
+            loadAllDestinations();
+            setupFilters();
+            handleURLParameters();
+        });
+
+        function refreshAuthUI() {
+            if (typeof userManager === 'undefined') return;
+            userManager.currentUser = userManager.getCurrentUser();
+            if (userManager.currentUser) {
+                userManager.updateUIForLoggedInUser();
+            } else {
+                userManager.updateUIForLoggedOutUser();
+            }
+        }
+
+        function updateLogoOnPage() {
+            const savedLogo = localStorage.getItem('siteLogo');
+            const savedName = localStorage.getItem('siteName');
+            
+            if (savedLogo) {
+                const logoIcon = document.querySelector('.logo i');
+                if (logoIcon) {
+                    const img = document.createElement('img');
+                    img.src = savedLogo;
+                    img.style.width = '40px';
+                    img.style.height = '40px';
+                    img.style.objectFit = 'contain';
+                    img.style.marginRight = '0.5rem';
+                    logoIcon.parentNode.replaceChild(img, logoIcon);
+                }
+            }
+            
+            if (savedName) {
+                const nameElement = document.querySelector('.logo span');
+                if (nameElement) nameElement.textContent = savedName;
+            }
+        }
+
+        function handleURLParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchTerm = urlParams.get('search');
+            const category = urlParams.get('category');
+            
+            if (searchTerm) {
+                document.getElementById('search-input').value = searchTerm;
+            }
+            
+            if (category) {
+                document.getElementById('category-filter').value = category;
+            }
+            
+            if (searchTerm || category) {
+                setTimeout(() => {
+                    searchDestinations();
+                }, 100);
+            }
+        }
+
+        function loadAllDestinations() {
+            const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]');
+            const fallbackImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450'%3E%3Crect width='100%25' height='100%25' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%23475569' font-size='28' font-family='Arial'%3EImage Not Available%3C/text%3E%3C/svg%3E";
+            const resolveImage = (dest) => {
+                const img = dest?.imageUrl || dest?.image || dest?.frontImage || '';
+                return (typeof img === 'string' && img.trim()) ? img : fallbackImage;
+            };
+            const normalizeKey = (dest) => String(dest?.id || '').trim() || String(dest?.name || '').trim().toLowerCase();
+            const fallbackData = [
+                {
+                    id: 1,
+                    name: "Taj Mahal",
+                    description: "Iconic white marble mausoleum and UNESCO World Heritage Site in Agra.",
+                    bestTime: "October to March",
+                    rating: 4.9,
+                    category: "cultural",
+                    imageUrl: "https://images.unsplash.com/photo-1548013146-72479768bada?w=400"
+                },
+                {
+                    id: 2,
+                    name: "Goa Beaches",
+                    description: "Beautiful beaches with Portuguese heritage and vibrant nightlife.",
+                    bestTime: "November to February",
+                    rating: 4.7,
+                    category: "beach",
+                    imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400"
+                },
+                {
+                    id: 3,
+                    name: "Kerala Backwaters",
+                    description: "Serene backwaters with houseboat cruises and lush greenery.",
+                    bestTime: "September to March",
+                    rating: 4.8,
+                    category: "nature",
+                    imageUrl: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400"
+                }
+            ];
+
+            // Merge fallback + saved data so partial/broken saved payload does not hide other destinations.
+            const map = new Map();
+            fallbackData.forEach(dest => {
+                const key = normalizeKey(dest);
+                map.set(key, { ...dest });
+            });
+            savedDestinations.forEach(dest => {
+                const key = normalizeKey(dest);
+                if (!key) return;
+                const base = map.get(key) || {};
+                map.set(key, { ...base, ...dest });
+            });
+            const destinations = Array.from(map.values()).map(dest => ({
+                ...dest,
+                image: resolveImage(dest),
+                imageUrl: resolveImage(dest)
+            }));
+            const container = document.getElementById('destination-list');
+            
+            container.innerHTML = destinations.map(dest => `
+                <div class="destination-card" data-category="${dest.category}" onclick="viewDestination('${encodeURIComponent(dest.name)}')" role="button" tabindex="0" onkeydown="handleDestinationKeydown(event, '${encodeURIComponent(dest.name)}')">
+                    <img src="${resolveImage(dest)}" alt="${dest.name}" loading="lazy" onerror="this.src='${fallbackImage}'">
+                    <div class="card-content">
+                        <h3>${dest.name}</h3>
+                        <p class="description">${dest.description}</p>
+                        <p class="best-time"><i class="fas fa-calendar"></i> <strong>Best Time:</strong> ${dest.bestTime}</p>
+                        <div class="card-footer">
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>${dest.rating}/5</span>
+                            </div>
+                            <button class="book-btn" onclick="event.stopPropagation(); bookDestination('${dest.name}')">
+                                <i class="fas fa-bookmark"></i> Book Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setupFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    const filter = btn.dataset.filter;
+                    const cards = document.querySelectorAll('.destination-card');
+                    cards.forEach(card => {
+                        if (filter === 'all' || card.dataset.category === filter) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        }
+
+        function bookDestination(name) {
+            if (!userManager.currentUser) {
+                userManager.showLogin();
+                return;
+            }
+            localStorage.setItem('selectedDestinationForGuideBooking', name || '');
+            window.location.href = `guides.html?destination=${encodeURIComponent(name || '')}`;
+        }
+
+        function viewDestination(encodedName) {
+            window.location.href = `destination-detail.html?name=${encodedName}`;
+        }
+
+        function handleDestinationKeydown(event, encodedName) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                viewDestination(encodedName);
+            }
+        }
+
+        function searchDestinations() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            const cards = document.querySelectorAll('.destination-card');
+            
+            cards.forEach(card => {
+                const name = card.querySelector('h3').textContent.toLowerCase();
+                const cardCategory = card.dataset.category;
+                
+                const matchesSearch = name.includes(searchTerm);
+                const matchesCategory = !category || cardCategory === category;
+                
+                if (matchesSearch && matchesCategory) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+
+
+
