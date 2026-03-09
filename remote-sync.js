@@ -1,6 +1,6 @@
 (function () {
     const SYNC_KEYS = ['destinations', 'allUsers', 'bookings', 'deletedDefaultDestinations'];
-    const SETTINGS_KEYS = ['siteLogo', 'siteName', 'heroTitle', 'heroSubtitle', 'heroPrimaryBtnText', 'heroSecondaryBtnText', 'heroBackgroundImage', 'contactEmail', 'supportEmail', 'contactPhone', 'contactAddress', 'currency', 'taxRate', 'lastUpdated', 'settingsVersion'];
+    const SETTINGS_KEYS = ['siteLogo', 'siteName', 'heroTitle', 'heroSubtitle', 'heroPrimaryBtnText', 'heroSecondaryBtnText', 'heroBackgroundImage', 'contactEmail', 'supportEmail', 'contactPhone', 'contactAddress', 'currency', 'taxRate', 'lastUpdated', 'settingsVersion', 'deletedUserIds', 'deletedDestinationNames', 'deletedBookingIds'];
     const SUPABASE_URL =
         localStorage.getItem('SUPABASE_URL') ||
         'https://ghidvuoipfndpfqyhidz.supabase.co';
@@ -34,6 +34,19 @@
         return SETTINGS_KEYS
             .map((key) => ({ key, value_text: localStorage.getItem(key) }))
             .filter((row) => row.value_text != null);
+    }
+
+    function getJsonArray(key) {
+        const parsed = safeJsonParse(localStorage.getItem(key) || '[]', []);
+        return Array.isArray(parsed) ? parsed : [];
+    }
+
+    function getDeletedIdSet(key) {
+        return new Set(getJsonArray(key).map((v) => String(v)));
+    }
+
+    function getDeletedNameSet(key) {
+        return new Set(getJsonArray(key).map((v) => String(v || '').toLowerCase()));
     }
 
     function supabaseFetch(path, options = {}) {
@@ -315,6 +328,36 @@
         }
     }
 
+    function applyDeleteTombstonesToLocalState() {
+        const deletedUserIds = getDeletedIdSet('deletedUserIds');
+        const deletedDestinationNames = getDeletedNameSet('deletedDestinationNames');
+        const deletedBookingIds = getDeletedIdSet('deletedBookingIds');
+
+        const allUsers = safeJsonParse(localStorage.getItem('allUsers') || '[]', []);
+        const nextUsers = Array.isArray(allUsers)
+            ? allUsers.filter((u) => !deletedUserIds.has(String(u && u.id)))
+            : [];
+        if (JSON.stringify(allUsers) !== JSON.stringify(nextUsers)) {
+            localStorage.setItem('allUsers', JSON.stringify(nextUsers));
+        }
+
+        const destinations = safeJsonParse(localStorage.getItem('destinations') || '[]', []);
+        const nextDestinations = Array.isArray(destinations)
+            ? destinations.filter((d) => !deletedDestinationNames.has(String((d && d.name) || '').toLowerCase()))
+            : [];
+        if (JSON.stringify(destinations) !== JSON.stringify(nextDestinations)) {
+            localStorage.setItem('destinations', JSON.stringify(nextDestinations));
+        }
+
+        const bookings = safeJsonParse(localStorage.getItem('bookings') || '[]', []);
+        const nextBookings = Array.isArray(bookings)
+            ? bookings.filter((b) => !deletedBookingIds.has(String(b && b.id)))
+            : [];
+        if (JSON.stringify(bookings) !== JSON.stringify(nextBookings)) {
+            localStorage.setItem('bookings', JSON.stringify(nextBookings));
+        }
+    }
+
     async function pullRemoteState() {
         try {
             suppressPush = true;
@@ -362,6 +405,7 @@
                 console.warn('Supabase settings pull skipped:', settingsErr.message || settingsErr);
             }
 
+            applyDeleteTombstonesToLocalState();
             syncCurrentUserFromAllUsers();
             window.dispatchEvent(new CustomEvent('remoteStatePulled'));
         } catch (error) {
@@ -374,14 +418,24 @@
     async function pushRemoteState() {
         try {
             const payload = getLocalState();
+            const deletedUserIds = getDeletedIdSet('deletedUserIds');
+            const deletedDestinationNames = getDeletedNameSet('deletedDestinationNames');
+            const deletedBookingIds = getDeletedIdSet('deletedBookingIds');
+
             const destinations = Array.isArray(payload.destinations)
-                ? payload.destinations.map((d) => pruneLargeStrings(mapDestinationForDb(d), 500000))
+                ? payload.destinations
+                    .filter((d) => !deletedDestinationNames.has(String((d && d.name) || '').toLowerCase()))
+                    .map((d) => pruneLargeStrings(mapDestinationForDb(d), 500000))
                 : [];
             const users = Array.isArray(payload.allUsers)
-                ? payload.allUsers.map((u) => pruneLargeStrings(mapUserForDb(u)))
+                ? payload.allUsers
+                    .filter((u) => !deletedUserIds.has(String(u && u.id)))
+                    .map((u) => pruneLargeStrings(mapUserForDb(u)))
                 : [];
             const bookings = Array.isArray(payload.bookings)
-                ? payload.bookings.map((b) => pruneLargeStrings(mapBookingForDb(b)))
+                ? payload.bookings
+                    .filter((b) => !deletedBookingIds.has(String(b && b.id)))
+                    .map((b) => pruneLargeStrings(mapBookingForDb(b)))
                 : [];
             const settingsRows = getLocalSettingsRows().map((row) => ({
                 key: row.key,

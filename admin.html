@@ -624,7 +624,7 @@
         </div>
     </div>
 
-    <script src="remote-sync.js?v=8"></script>
+    <script src="remote-sync.js?v=9"></script>
     <script>
         // Login functionality
         document.getElementById('login-form').addEventListener('submit', function(e) {
@@ -857,6 +857,18 @@
                 const id = decodeURIComponent(String(encodedId || ''));
                 const updatedUsers = allUsers.filter(u => String(u.id) !== id);
                 localStorage.setItem('allUsers', JSON.stringify(updatedUsers));
+                const deletedUserIds = JSON.parse(localStorage.getItem('deletedUserIds') || '[]');
+                if (!deletedUserIds.includes(id)) {
+                    deletedUserIds.push(id);
+                    localStorage.setItem('deletedUserIds', JSON.stringify(deletedUserIds));
+                }
+
+                const allBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                const filteredBookings = allBookings.filter(
+                    b => String(b.customerId || '') !== id && String(b.guideId || '') !== id
+                );
+                localStorage.setItem('bookings', JSON.stringify(filteredBookings));
+
                 const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
                 if (currentUser && String(currentUser.id) === id) {
                     localStorage.removeItem('currentUser');
@@ -864,6 +876,7 @@
                     localStorage.removeItem('lastLoggedInEmail');
                 }
                 window.dispatchEvent(new CustomEvent('usersUpdated'));
+                window.dispatchEvent(new CustomEvent('settingsUpdated'));
                 loadData();
                 alert('User deleted successfully!');
             }
@@ -1163,9 +1176,16 @@
                     deletedDefaultNames.add(targetName);
                     saveDeletedDefaultDestinationNameSet(deletedDefaultNames);
                 }
+
+                const deletedDestinationNames = JSON.parse(localStorage.getItem('deletedDestinationNames') || '[]');
+                if (!deletedDestinationNames.includes(targetName)) {
+                    deletedDestinationNames.push(targetName);
+                    localStorage.setItem('deletedDestinationNames', JSON.stringify(deletedDestinationNames));
+                }
                 
                 // Dispatch custom event for same-tab updates
                 window.dispatchEvent(new CustomEvent('destinationsUpdated'));
+                window.dispatchEvent(new CustomEvent('settingsUpdated'));
                 
                 // Dispatch storage event to notify other pages
                 window.dispatchEvent(new StorageEvent('storage', {
