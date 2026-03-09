@@ -3469,15 +3469,7 @@ input[name="cardNumber"]:focus {
     }
 
     .navbar .nav-menu {
-        position: static !important;
-        width: 100% !important;
-        display: flex !important;
-        flex-wrap: wrap !important;
-        justify-content: center !important;
-        gap: 10px 14px !important;
-        padding: 0 4px 2px !important;
-        margin: 0 !important;
-        overflow: visible !important;
+        display: none !important;
     }
 
     .navbar .nav-menu li {
