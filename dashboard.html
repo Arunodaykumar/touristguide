@@ -36,7 +36,7 @@
         </div>
     </section>
 
-    <script src="remote-sync.js?v=9"></script>
+    <script src="remote-sync.js?v=10"></script>
     <script src="user-manager.js"></script>
     <script src="logo-global.js?v=2"></script>
     <script>
@@ -166,6 +166,17 @@
                 return Number.isNaN(parsed.getTime()) ? 'Recently joined' : parsed.toLocaleDateString();
             })();
             const directBookings = userData.bookings || [];
+            const globalBookings = safeParseJSON('bookings', []);
+            const inferredUserBookings = Array.isArray(globalBookings)
+                ? globalBookings.filter(booking => {
+                    const customerIdMatch = String(booking.customerId || '') === String(userData.id || '');
+                    const guideIdMatch = String(booking.guideId || '') === String(userData.id || '');
+                    const customerEmailMatch = String((booking.customerEmail || '')).toLowerCase() === String((userData.email || '')).toLowerCase();
+                    const customerNameMatch = String((booking.customerName || '')).toLowerCase() === String((userData.name || '')).toLowerCase();
+                    if (userData.role === 'guide') return guideIdMatch;
+                    return customerIdMatch || customerEmailMatch || customerNameMatch;
+                })
+                : [];
             const inferredGuideBookings = userData.role === 'guide'
                 ? allUsers
                     .flatMap(user => user.bookings || [])
@@ -177,7 +188,7 @@
 
             // Merge direct + inferred bookings and remove duplicates by booking id
             const bookingMap = new Map();
-            [...directBookings, ...inferredGuideBookings].forEach(booking => {
+            [...directBookings, ...inferredGuideBookings, ...inferredUserBookings].forEach(booking => {
                 if (booking && booking.id != null) {
                     bookingMap.set(String(booking.id), booking);
                 }
@@ -345,6 +356,10 @@
                 status: 'confirmed',
                 bookingDate: new Date().toISOString()
             };
+
+            const globalBookings = safeParseJSON('bookings', []);
+            globalBookings.push(testBooking);
+            localStorage.setItem('bookings', JSON.stringify(globalBookings));
             
             // Add to current user
             currentUser.bookings = currentUser.bookings || [];

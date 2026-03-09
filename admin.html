@@ -624,7 +624,7 @@
         </div>
     </div>
 
-    <script src="remote-sync.js?v=9"></script>
+    <script src="remote-sync.js?v=10"></script>
     <script>
         // Login functionality
         document.getElementById('login-form').addEventListener('submit', function(e) {
@@ -799,6 +799,16 @@
             const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
             const guides = allUsers.filter(user => user.role === 'guide');
             const userBookings = allUsers.flatMap(user => user.bookings || []);
+            const globalBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            const bookingMap = new Map();
+            [...globalBookings, ...userBookings].forEach(booking => {
+                if (!booking) return;
+                const key = booking.id != null
+                    ? String(booking.id)
+                    : JSON.stringify([booking.type, booking.destination, booking.guide, booking.date, booking.customerId, booking.guideId]);
+                if (!bookingMap.has(key)) bookingMap.set(key, booking);
+            });
+            const mergedBookings = Array.from(bookingMap.values());
             
             const savedDestinations = JSON.parse(localStorage.getItem('destinations') || '[]');
             const deletedDefaultNames = getDeletedDefaultDestinationNameSet();
@@ -810,7 +820,7 @@
             
             document.getElementById('total-users').textContent = allUsers.length;
             document.getElementById('total-guides').textContent = guides.length;
-            document.getElementById('total-bookings').textContent = userBookings.length;
+            document.getElementById('total-bookings').textContent = mergedBookings.length;
             document.getElementById('total-destinations').textContent = allDestinations.length;
             
             // Load users table
@@ -833,9 +843,9 @@
             
             // Load bookings table
             const bookingsTable = document.getElementById('bookings-table');
-            if (userBookings.length > 0) {
+            if (mergedBookings.length > 0) {
                 bookingsTable.innerHTML = '<div class="table-wrap"><table style="width:100%; border-collapse: collapse; background:white; border-radius:10px; overflow:hidden;"><tr style="background:#f8f9fa;"><th style="padding:15px; border:1px solid #ddd;">Service</th><th style="padding:15px; border:1px solid #ddd;">Date</th><th style="padding:15px; border:1px solid #ddd;">Amount</th><th style="padding:15px; border:1px solid #ddd;">Status</th></tr>' + 
-                userBookings.map(booking => `<tr><td style="padding:15px; border:1px solid #ddd;">${booking.guide || booking.destination || 'N/A'}</td><td style="padding:15px; border:1px solid #ddd;">${booking.date || 'N/A'}</td><td style="padding:15px; border:1px solid #ddd;">₹${booking.amount || 0}</td><td style="padding:15px; border:1px solid #ddd;"><span style="background:#27ae60; color:white; padding:4px 8px; border-radius:4px; font-size:12px;">${booking.status || 'Confirmed'}</span></td></tr>`).join('') + '</table></div>';
+                mergedBookings.map(booking => `<tr><td style="padding:15px; border:1px solid #ddd;">${booking.guide || booking.destination || 'N/A'}</td><td style="padding:15px; border:1px solid #ddd;">${booking.date || 'N/A'}</td><td style="padding:15px; border:1px solid #ddd;">₹${booking.amount || 0}</td><td style="padding:15px; border:1px solid #ddd;"><span style="background:#27ae60; color:white; padding:4px 8px; border-radius:4px; font-size:12px;">${booking.status || 'Confirmed'}</span></td></tr>`).join('') + '</table></div>';
             } else {
                 bookingsTable.innerHTML = '<div style="background:white; padding:20px; border-radius:10px;">No bookings found</div>';
             }

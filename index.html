@@ -1368,7 +1368,7 @@
             }
         });
     </script>
-    <script src="remote-sync.js?v=9"></script>
+    <script src="remote-sync.js?v=10"></script>
     <script src="user-manager.js"></script>
     <script src="review-system.js"></script>
     <script src="logo-global.js?v=2"></script>
@@ -1861,6 +1861,10 @@
                 bookingDate: new Date().toISOString()
             };
 
+            const globalBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            globalBookings.push(booking);
+            localStorage.setItem('bookings', JSON.stringify(globalBookings));
+
             const bookingMessage = {
                 id: Date.now() + 2,
                 from: userManager.currentUser.id,
@@ -2284,6 +2288,10 @@
                     id: Date.now(),
                     type: 'destination',
                     destination: bookingData.destination,
+                    customerName: userManager.currentUser?.name || '',
+                    customerId: userManager.currentUser?.id || '',
+                    customerEmail: userManager.currentUser?.email || '',
+                    customerPhone: userManager.currentUser?.phone || '',
                     date: bookingData.date,
                     people: bookingData.people,
                     package: bookingData.package,
@@ -2294,6 +2302,10 @@
                     status: 'confirmed',
                     bookingDate: new Date().toISOString()
                 };
+
+                const globalBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                globalBookings.push(booking);
+                localStorage.setItem('bookings', JSON.stringify(globalBookings));
                 
                 if (userManager.currentUser) {
                     userManager.currentUser.bookings = userManager.currentUser.bookings || [];
