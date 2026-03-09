@@ -30,5 +30,28 @@ function updateGlobalLogo() {
     }
 }
 
+function bindLogoNavigation() {
+    const logoBlocks = document.querySelectorAll('.logo, .footer-logo');
+    logoBlocks.forEach((block) => {
+        if (!block || block.closest('a')) return;
+        block.style.cursor = 'pointer';
+        block.setAttribute('role', 'link');
+        if (!block.hasAttribute('tabindex')) block.setAttribute('tabindex', '0');
+
+        block.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+        block.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                window.location.href = 'index.html';
+            }
+        });
+    });
+}
+
 // Auto-run on page load
-document.addEventListener('DOMContentLoaded', updateGlobalLogo);
+document.addEventListener('DOMContentLoaded', function () {
+    updateGlobalLogo();
+    bindLogoNavigation();
+});
