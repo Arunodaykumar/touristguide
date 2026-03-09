@@ -817,7 +817,7 @@
             const usersTable = document.getElementById('users-table');
             if (allUsers.length > 0) {
                 usersTable.innerHTML = '<div class="table-wrap"><table style="width:100%; border-collapse: collapse; background:white; border-radius:10px; overflow:hidden;"><tr style="background:#f8f9fa;"><th style="padding:15px; border:1px solid #ddd;">Name</th><th style="padding:15px; border:1px solid #ddd;">Email</th><th style="padding:15px; border:1px solid #ddd;">Phone</th><th style="padding:15px; border:1px solid #ddd;">Role</th><th style="padding:15px; border:1px solid #ddd;">Actions</th></tr>' + 
-                allUsers.map(user => `<tr><td style="padding:15px; border:1px solid #ddd;">${user.name}</td><td style="padding:15px; border:1px solid #ddd;">${user.email}</td><td style="padding:15px; border:1px solid #ddd;">${user.phone || 'N/A'}</td><td style="padding:15px; border:1px solid #ddd;"><span style="background:${user.role === 'guide' ? '#3498db' : '#95a5a6'}; color:white; padding:4px 8px; border-radius:4px; font-size:12px;">${user.role || 'user'}</span></td><td style="padding:15px; border:1px solid #ddd;"><button onclick="deleteUser(${user.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">Delete</button></td></tr>`).join('') + '</table></div>';
+                allUsers.map(user => `<tr><td style="padding:15px; border:1px solid #ddd;">${user.name}</td><td style="padding:15px; border:1px solid #ddd;">${user.email}</td><td style="padding:15px; border:1px solid #ddd;">${user.phone || 'N/A'}</td><td style="padding:15px; border:1px solid #ddd;"><span style="background:${user.role === 'guide' ? '#3498db' : '#95a5a6'}; color:white; padding:4px 8px; border-radius:4px; font-size:12px;">${user.role || 'user'}</span></td><td style="padding:15px; border:1px solid #ddd;"><button onclick='deleteUser("${encodeURIComponent(String(user.id || ""))}")' style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">Delete</button></td></tr>`).join('') + '</table></div>';
             } else {
                 usersTable.innerHTML = '<div style="background:white; padding:20px; border-radius:10px;">No users found</div>';
             }
@@ -851,11 +851,19 @@
         }
         
         // Admin functions
-        function deleteUser(id) {
+        function deleteUser(encodedId) {
             if (confirm('Delete this user?')) {
                 const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
-                const updatedUsers = allUsers.filter(u => u.id != id);
+                const id = decodeURIComponent(String(encodedId || ''));
+                const updatedUsers = allUsers.filter(u => String(u.id) !== id);
                 localStorage.setItem('allUsers', JSON.stringify(updatedUsers));
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+                if (currentUser && String(currentUser.id) === id) {
+                    localStorage.removeItem('currentUser');
+                    localStorage.removeItem('activeUserId');
+                    localStorage.removeItem('lastLoggedInEmail');
+                }
+                window.dispatchEvent(new CustomEvent('usersUpdated'));
                 loadData();
                 alert('User deleted successfully!');
             }
