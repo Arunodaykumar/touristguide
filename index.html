@@ -1035,11 +1035,16 @@
             },
             updateUI: function() {
                 const authButtons = document.querySelector('.auth-buttons');
-                if (authButtons && this.currentUser) {
-                    const unreadCount = this.getUnreadNotificationCount();
-                    const notificationBadge = unreadCount > 0 ? `<span class="notification-badge">${unreadCount}</span>` : '';
-                    
-                    authButtons.innerHTML = `
+                if (!authButtons) return;
+                authButtons.innerHTML = this.renderUnifiedAuthMenu(this.currentUser || null);
+                this.bindMobileMenuHandlers();
+            },
+            renderUnifiedAuthMenu: function(user) {
+                const unreadCount = user ? this.getUnreadNotificationCount() : 0;
+                const notificationBadge = unreadCount > 0 ? `<span class="notification-badge">${unreadCount}</span>` : '';
+                const welcomeText = user ? `Welcome, ${user.name}` : 'Welcome';
+                const desktopLoggedIn = user ? `
+                    <div class="user-menu desktop-user-actions">
                         <button onclick="userManager.showNotifications()" class="btn-notifications">
                             <i class="fas fa-bell"></i>${notificationBadge}
                         </button>
@@ -1047,10 +1052,65 @@
                             <i class="fas fa-envelope"></i>
                         </button>
                         <a href="dashboard.html" class="btn-dashboard-link">Dashboard</a>
-                        <span>Welcome, ${this.currentUser.name}</span>
+                        <span>${welcomeText}</span>
                         <button onclick="userManager.logout()" class="btn-logout">Logout</button>
-                    `;
-                }
+                    </div>
+                ` : `
+                    <div class="desktop-user-actions">
+                        <button onclick="userManager.showLogin()" class="btn-login">Login</button>
+                        <button onclick="userManager.showRegister()" class="btn-register">Register</button>
+                    </div>
+                `;
+
+                const menuItems = `
+                    <a href="index.html">Home</a>
+                    <a href="destinations.html">Destinations</a>
+                    <a href="guides.html">Guides</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="admin.html">Admin</a>
+                `;
+
+                const userItems = user ? `
+                    <div class="mobile-menu-welcome">${welcomeText}</div>
+                    <button onclick="userManager.showNotifications(); userManager.closeMobileUnifiedMenu();"><i class="fas fa-bell"></i> Alerts ${unreadCount > 0 ? `(${unreadCount})` : ''}</button>
+                    <button onclick="userManager.showMessages(); userManager.closeMobileUnifiedMenu();"><i class="fas fa-envelope"></i> Inbox</button>
+                    <a href="dashboard.html">Dashboard</a>
+                    <button onclick="userManager.logout(); userManager.closeMobileUnifiedMenu();">Logout</button>
+                ` : `
+                    <button onclick="userManager.showLogin(); userManager.closeMobileUnifiedMenu();">Login</button>
+                    <button onclick="userManager.showRegister(); userManager.closeMobileUnifiedMenu();">Register</button>
+                `;
+
+                return `
+                    ${desktopLoggedIn}
+                    <div class="mobile-unified-menu">
+                        <button class="mobile-unified-trigger" onclick="userManager.toggleMobileUnifiedMenu(this)">
+                            <i class="fas fa-bars"></i> Menu
+                        </button>
+                        <div class="mobile-unified-panel">
+                            ${menuItems}
+                            ${userItems}
+                        </div>
+                    </div>
+                `;
+            },
+            toggleMobileUnifiedMenu: function(buttonEl) {
+                const wrap = buttonEl ? buttonEl.closest('.mobile-unified-menu') : null;
+                if (!wrap) return;
+                wrap.classList.toggle('open');
+            },
+            closeMobileUnifiedMenu: function() {
+                document.querySelectorAll('.mobile-unified-menu.open').forEach((el) => el.classList.remove('open'));
+            },
+            bindMobileMenuHandlers: function() {
+                if (this._mobileMenuBound) return;
+                this._mobileMenuBound = true;
+                document.addEventListener('click', function(event) {
+                    const insideMenu = event.target.closest('.mobile-unified-menu');
+                    if (!insideMenu) {
+                        userManager.closeMobileUnifiedMenu();
+                    }
+                });
             },
             logout: function() {
                 this.currentUser = null;
@@ -1060,10 +1120,8 @@
                 try { window.name = ''; } catch (e) {}
                 const authButtons = document.querySelector('.auth-buttons');
                 if (authButtons) {
-                    authButtons.innerHTML = `
-                        <button onclick="userManager.showLogin()" class="btn-login">Login</button>
-                        <button onclick="userManager.showRegister()" class="btn-register">Register</button>
-                    `;
+                    authButtons.innerHTML = this.renderUnifiedAuthMenu(null);
+                    this.bindMobileMenuHandlers();
                 }
                 showNotification('Logged out successfully', 'info');
             },
