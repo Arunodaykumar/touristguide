@@ -3504,6 +3504,8 @@ input[name="cardNumber"]:focus {
         width: 100% !important;
         display: flex !important;
         justify-content: center !important;
+        padding: 0 10px !important;
+        box-sizing: border-box !important;
     }
 
     .desktop-user-actions {
@@ -3513,16 +3515,22 @@ input[name="cardNumber"]:focus {
     .mobile-unified-menu {
         display: block !important;
         width: 100%;
+        max-width: 100%;
+        box-sizing: border-box !important;
     }
 
     .mobile-unified-trigger {
         width: 100%;
+        max-width: 100%;
+        box-sizing: border-box !important;
     }
 
     .mobile-unified-panel {
         position: static;
         width: 100%;
         margin-top: 8px;
+        max-width: 100%;
+        box-sizing: border-box !important;
     }
 
     .navbar .auth-buttons .user-menu {

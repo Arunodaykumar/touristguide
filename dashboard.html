@@ -456,7 +456,24 @@
             }
 
             .dashboard-stats {
-                grid-template-columns: 1fr 1fr !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 12px !important;
+            }
+
+            .dashboard-stats .stat-card {
+                padding: 16px !important;
+                overflow: hidden;
+            }
+
+            .dashboard-stats .stat-card h3 {
+                font-size: 1.9rem !important;
+                line-height: 1.1;
+            }
+
+            .dashboard-stats .stat-card p {
+                font-size: 0.95rem !important;
+                line-height: 1.25;
+                word-break: break-word;
             }
 
             .dashboard-main-grid {
@@ -468,6 +485,12 @@
                 flex-direction: column;
                 align-items: flex-start !important;
                 gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-stats {
+                grid-template-columns: 1fr !important;
             }
         }
     </style>
