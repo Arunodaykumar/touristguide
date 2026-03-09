@@ -36,7 +36,7 @@
         </div>
     </section>
 
-    <script src="remote-sync.js?v=10"></script>
+    <script src="remote-sync.js?v=11"></script>
     <script src="user-manager.js"></script>
     <script src="logo-global.js?v=2"></script>
     <script>
@@ -309,10 +309,13 @@
 
         window.addEventListener('focus', syncNavbarAuthState);
         window.addEventListener('storage', function(event) {
-            if (event.key === 'currentUser' || event.key === 'allUsers') {
+            if (event.key === 'currentUser' || event.key === 'allUsers' || event.key === 'bookings') {
                 syncNavbarAuthState();
+                loadDashboard();
             }
         });
+        window.addEventListener('bookingsUpdated', loadDashboard);
+        window.addEventListener('remoteStatePulled', loadDashboard);
         
         function updateLogoOnPage() {
             const savedLogo = localStorage.getItem('siteLogo');

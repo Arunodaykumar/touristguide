@@ -624,7 +624,7 @@
         </div>
     </div>
 
-    <script src="remote-sync.js?v=10"></script>
+    <script src="remote-sync.js?v=11"></script>
     <script>
         // Login functionality
         document.getElementById('login-form').addEventListener('submit', function(e) {
@@ -673,6 +673,18 @@
                 }
             });
         });
+
+        window.addEventListener('storage', function(event) {
+            if (!event.key || ['allUsers', 'bookings', 'destinations', 'currentUser'].includes(event.key)) {
+                if (document.getElementById('dashboard').style.display === 'block') {
+                    loadData();
+                }
+            }
+        });
+        window.addEventListener('remoteStatePulled', loadData);
+        window.addEventListener('bookingsUpdated', loadData);
+        window.addEventListener('usersUpdated', loadData);
+        window.addEventListener('destinationsUpdated', loadData);
 
         function getDefaultDestinations() {
             return [

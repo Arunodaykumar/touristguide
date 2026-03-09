@@ -97,7 +97,7 @@
     </main>
 
     <script src="logo-global.js?v=2"></script>
-    <script src="remote-sync.js?v=10"></script>
+    <script src="remote-sync.js?v=11"></script>
     <script src="user-manager.js"></script>
     <script>
         let currentDestination = null;
@@ -333,6 +333,10 @@
                 status: 'confirmed',
                 bookingDate: new Date().toISOString()
             };
+
+            const globalBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            globalBookings.push(booking);
+            localStorage.setItem('bookings', JSON.stringify(globalBookings));
             
             userManager.currentUser.bookings = userManager.currentUser.bookings || [];
             userManager.currentUser.bookings.push(booking);
@@ -383,6 +387,7 @@
 
             localStorage.setItem('allUsers', JSON.stringify(allUsers));
             localStorage.setItem('currentUser', JSON.stringify(userManager.currentUser));
+            window.dispatchEvent(new CustomEvent('bookingsUpdated'));
             
             closeModal(event.target);
             showNotification('Guide booked successfully!', 'success');
