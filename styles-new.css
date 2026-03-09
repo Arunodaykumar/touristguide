@@ -3526,11 +3526,7 @@ input[name="cardNumber"]:focus {
     }
 
     .navbar .auth-buttons .user-menu {
-        width: 100% !important;
-        display: grid !important;
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 10px !important;
-        align-items: stretch !important;
+        display: none !important;
     }
 
     .navbar .auth-buttons .user-menu > span {
@@ -3545,20 +3541,15 @@ input[name="cardNumber"]:focus {
     .navbar .auth-buttons .btn-messages,
     .navbar .auth-buttons .btn-dashboard-link,
     .navbar .auth-buttons .btn-logout {
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 10px 12px !important;
-        border-radius: 12px !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 6px !important;
-        font-size: 0.96rem !important;
-        line-height: 1.2 !important;
+        display: none !important;
     }
 
     .navbar .auth-buttons .btn-dashboard-link::before {
         content: '' !important;
+    }
+
+    .navbar .auth-buttons > :not(.mobile-unified-menu) {
+        display: none !important;
     }
 }
 /* Animation for notifications */
