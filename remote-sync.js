@@ -1,6 +1,6 @@
 (function () {
     const SYNC_KEYS = ['destinations', 'allUsers', 'bookings', 'deletedDefaultDestinations'];
-    const SETTINGS_KEYS = ['siteLogo', 'siteName', 'heroTitle', 'heroSubtitle', 'heroPrimaryBtnText', 'heroSecondaryBtnText', 'heroBackgroundImage', 'contactEmail', 'supportEmail', 'contactPhone', 'contactAddress', 'currency', 'taxRate', 'lastUpdated'];
+    const SETTINGS_KEYS = ['siteLogo', 'siteName', 'heroTitle', 'heroSubtitle', 'heroPrimaryBtnText', 'heroSecondaryBtnText', 'heroBackgroundImage', 'contactEmail', 'supportEmail', 'contactPhone', 'contactAddress', 'currency', 'taxRate', 'lastUpdated', 'settingsVersion'];
     const SUPABASE_URL =
         localStorage.getItem('SUPABASE_URL') ||
         'https://ghidvuoipfndpfqyhidz.supabase.co';
@@ -204,6 +204,36 @@
         }
     }
 
+    async function deleteRowById(table, idValue) {
+        if (idValue == null || idValue === '') return;
+        const res = await supabaseFetch(`/rest/v1/${table}?id=eq.${encodeURIComponent(String(idValue))}`, {
+            method: 'DELETE',
+            headers: { Prefer: 'return=minimal' }
+        });
+        if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(`Delete ${table}(${idValue}) failed: ${res.status} ${errText}`);
+        }
+    }
+
+    async function reconcileDeletes(table, localRows) {
+        if (!Array.isArray(localRows)) return;
+        const idsRes = await supabaseFetch(`/rest/v1/${table}?select=id`);
+        if (!idsRes.ok) {
+            const errText = await idsRes.text();
+            throw new Error(`Fetch ${table} ids failed: ${idsRes.status} ${errText}`);
+        }
+
+        const remoteRows = await idsRes.json();
+        const localIds = new Set(localRows.map((row) => String(row.id)));
+        const remoteIds = (remoteRows || []).map((row) => String(row.id));
+        const idsToDelete = remoteIds.filter((id) => !localIds.has(id));
+
+        for (const id of idsToDelete) {
+            await deleteRowById(table, id);
+        }
+    }
+
     async function upsertSettings(rows) {
         if (!Array.isArray(rows) || rows.length === 0) return;
         const maxBatchChars = 180000;
@@ -312,10 +342,21 @@
                 const settingsRes = await supabaseFetch('/rest/v1/app_settings?select=key,value_text');
                 if (settingsRes.ok) {
                     const settingsRows = await settingsRes.json();
+                    const settingsMap = {};
                     (settingsRows || []).forEach((row) => {
                         if (!row || !row.key) return;
-                        localStorage.setItem(String(row.key), row.value_text == null ? '' : String(row.value_text));
+                        settingsMap[String(row.key)] = row.value_text == null ? '' : String(row.value_text);
                     });
+
+                    const localVersion = Number(localStorage.getItem('settingsVersion') || '0') || 0;
+                    const remoteVersion = Number(settingsMap.settingsVersion || '0') || 0;
+                    const shouldApplyRemoteSettings = remoteVersion >= localVersion || localVersion === 0;
+
+                    if (shouldApplyRemoteSettings) {
+                        Object.keys(settingsMap).forEach((key) => {
+                            localStorage.setItem(key, settingsMap[key]);
+                        });
+                    }
                 }
             } catch (settingsErr) {
                 console.warn('Supabase settings pull skipped:', settingsErr.message || settingsErr);
@@ -352,18 +393,21 @@
             let syncedAny = false;
             try {
                 await upsertTable('destinations', destinations);
+                await reconcileDeletes('destinations', destinations);
                 syncedAny = true;
             } catch (err) {
                 console.warn('Supabase destinations upsert failed:', err.message || err);
             }
             try {
                 await upsertTable('users', users);
+                await reconcileDeletes('users', users);
                 syncedAny = true;
             } catch (err) {
                 console.warn('Supabase users upsert failed:', err.message || err);
             }
             try {
                 await upsertTable('bookings', bookings);
+                await reconcileDeletes('bookings', bookings);
                 syncedAny = true;
             } catch (err) {
                 console.warn('Supabase bookings upsert failed:', err.message || err);

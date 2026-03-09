@@ -50,8 +50,38 @@ function bindLogoNavigation() {
     });
 }
 
+function setupDelegatedLogoNavigation() {
+    const goHome = () => {
+        window.location.assign('index.html');
+    };
+
+    document.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!target || typeof target.closest !== 'function') return;
+
+        const logoBlock = target.closest('.logo, .footer-logo');
+        if (!logoBlock || logoBlock.closest('a')) return;
+
+        event.preventDefault();
+        goHome();
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        const target = event.target;
+        if (!target || typeof target.closest !== 'function') return;
+
+        const logoBlock = target.closest('.logo, .footer-logo');
+        if (!logoBlock || logoBlock.closest('a')) return;
+
+        event.preventDefault();
+        goHome();
+    });
+}
+
 // Auto-run on page load
 document.addEventListener('DOMContentLoaded', function () {
     updateGlobalLogo();
     bindLogoNavigation();
+    setupDelegatedLogoNavigation();
 });

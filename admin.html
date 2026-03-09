@@ -624,7 +624,7 @@
         </div>
     </div>
 
-    <script src="remote-sync.js?v=6"></script>
+    <script src="remote-sync.js?v=8"></script>
     <script>
         // Login functionality
         document.getElementById('login-form').addEventListener('submit', function(e) {
@@ -1202,7 +1202,15 @@
             const heroPrimaryBtnText = document.getElementById('hero-primary-btn-input').value;
             const heroSecondaryBtnText = document.getElementById('hero-secondary-btn-input').value;
             const heroBgUrl = document.getElementById('hero-bg-url-input').value;
+            const contactEmail = document.getElementById('contact-email')?.value || '';
+            const supportEmail = document.getElementById('support-email')?.value || '';
+            const contactPhone = document.getElementById('contact-phone')?.value || '';
+            const contactAddress = document.getElementById('contact-address')?.value || '';
+            const currency = document.getElementById('currency')?.value || 'INR';
+            const taxRate = document.getElementById('tax-rate')?.value || '18';
             
+            const settingsVersion = String(Date.now());
+
             if (siteName) {
                 localStorage.setItem('siteName', siteName);
             }
@@ -1214,10 +1222,22 @@
             if (heroBgUrl && heroBgUrl.trim()) {
                 localStorage.setItem('heroBackgroundImage', heroBgUrl.trim());
             }
+            localStorage.setItem('contactEmail', contactEmail);
+            localStorage.setItem('supportEmail', supportEmail);
+            localStorage.setItem('contactPhone', contactPhone);
+            localStorage.setItem('contactAddress', contactAddress);
+            localStorage.setItem('currency', currency);
+            localStorage.setItem('taxRate', taxRate);
+            localStorage.setItem('settingsVersion', settingsVersion);
 
             function finishSettingsSave(successMessage) {
                 localStorage.setItem('lastUpdated', new Date().toLocaleString());
                 window.dispatchEvent(new CustomEvent('settingsUpdated'));
+                if (window.remoteStateSync && typeof window.remoteStateSync.pushRemoteState === 'function') {
+                    window.remoteStateSync.pushRemoteState().catch((err) => {
+                        console.warn('Manual remote push failed:', err && err.message ? err.message : err);
+                    });
+                }
                 alert(successMessage);
                 loadData();
             }
@@ -1321,7 +1341,13 @@
             localStorage.setItem('contactPhone', contactPhone);
             localStorage.setItem('contactAddress', contactAddress);
             localStorage.setItem('lastUpdated', new Date().toLocaleString());
+            localStorage.setItem('settingsVersion', String(Date.now()));
             window.dispatchEvent(new CustomEvent('settingsUpdated'));
+            if (window.remoteStateSync && typeof window.remoteStateSync.pushRemoteState === 'function') {
+                window.remoteStateSync.pushRemoteState().catch((err) => {
+                    console.warn('Manual remote push failed:', err && err.message ? err.message : err);
+                });
+            }
             alert('Contact settings saved successfully!');
             updateSystemInfo();
         }
@@ -1332,7 +1358,13 @@
             localStorage.setItem('currency', currency);
             localStorage.setItem('taxRate', taxRate);
             localStorage.setItem('lastUpdated', new Date().toLocaleString());
+            localStorage.setItem('settingsVersion', String(Date.now()));
             window.dispatchEvent(new CustomEvent('settingsUpdated'));
+            if (window.remoteStateSync && typeof window.remoteStateSync.pushRemoteState === 'function') {
+                window.remoteStateSync.pushRemoteState().catch((err) => {
+                    console.warn('Manual remote push failed:', err && err.message ? err.message : err);
+                });
+            }
             alert('Payment settings saved successfully!');
             updateSystemInfo();
         }
