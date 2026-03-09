@@ -270,33 +270,97 @@ class UserManager {
         // Update navigation
         const authButtons = document.querySelector('.auth-buttons');
         if (authButtons) {
-            const unreadCount = this.getUnreadNotificationCount();
-            const notificationBadge = unreadCount > 0 ? `<span class="notification-badge">${unreadCount}</span>` : '';
-            
-            authButtons.innerHTML = `
-                <div class="user-menu">
-                    <button onclick="userManager.showNotifications()" class="btn-notifications">
-                        <i class="fas fa-bell"></i>${notificationBadge}
-                    </button>
-                    <button onclick="userManager.showMessages()" class="btn-messages">
-                        <i class="fas fa-envelope"></i>
-                    </button>
-                    <a href="dashboard.html" class="btn-dashboard-link">Dashboard</a>
-                    <span>Welcome, ${this.currentUser.name}</span>
-                    <button onclick="userManager.logout()" class="btn-logout">Logout</button>
-                </div>
-            `;
+            authButtons.innerHTML = this.renderUnifiedAuthMenu(this.currentUser);
+            this.bindMobileMenuHandlers();
         }
     }
 
     updateUIForLoggedOutUser() {
         const authButtons = document.querySelector('.auth-buttons');
         if (authButtons) {
-            authButtons.innerHTML = `
+            authButtons.innerHTML = this.renderUnifiedAuthMenu(null);
+            this.bindMobileMenuHandlers();
+        }
+    }
+
+    renderUnifiedAuthMenu(user) {
+        const unreadCount = user ? this.getUnreadNotificationCount() : 0;
+        const notificationBadge = unreadCount > 0 ? `<span class="notification-badge">${unreadCount}</span>` : '';
+        const welcomeText = user ? `Welcome, ${user.name}` : 'Welcome';
+
+        const desktopLoggedIn = `
+            <div class="user-menu desktop-user-actions">
+                <button onclick="userManager.showNotifications()" class="btn-notifications">
+                    <i class="fas fa-bell"></i>${notificationBadge}
+                </button>
+                <button onclick="userManager.showMessages()" class="btn-messages">
+                    <i class="fas fa-envelope"></i>
+                </button>
+                <a href="dashboard.html" class="btn-dashboard-link">Dashboard</a>
+                <span>${welcomeText}</span>
+                <button onclick="userManager.logout()" class="btn-logout">Logout</button>
+            </div>
+        `;
+
+        const desktopLoggedOut = `
+            <div class="desktop-user-actions">
                 <button onclick="userManager.showLogin()" class="btn-login">Login</button>
                 <button onclick="userManager.showRegister()" class="btn-register">Register</button>
-            `;
-        }
+            </div>
+        `;
+
+        const mobileItemsCommon = `
+            <a href="index.html">Home</a>
+            <a href="destinations.html">Destinations</a>
+            <a href="guides.html">Guides</a>
+            <a href="contact.html">Contact</a>
+            <a href="admin.html">Admin</a>
+        `;
+
+        const mobileItemsLoggedIn = `
+            <div class="mobile-menu-welcome">${welcomeText}</div>
+            <button onclick="userManager.showNotifications(); userManager.closeMobileUnifiedMenu();"><i class="fas fa-bell"></i> Alerts ${unreadCount > 0 ? `(${unreadCount})` : ''}</button>
+            <button onclick="userManager.showMessages(); userManager.closeMobileUnifiedMenu();"><i class="fas fa-envelope"></i> Inbox</button>
+            <a href="dashboard.html">Dashboard</a>
+            <button onclick="userManager.logout(); userManager.closeMobileUnifiedMenu();">Logout</button>
+        `;
+
+        const mobileItemsLoggedOut = `
+            <button onclick="userManager.showLogin(); userManager.closeMobileUnifiedMenu();">Login</button>
+            <button onclick="userManager.showRegister(); userManager.closeMobileUnifiedMenu();">Register</button>
+        `;
+
+        return `
+            ${user ? desktopLoggedIn : desktopLoggedOut}
+            <div class="mobile-unified-menu">
+                <button class="mobile-unified-trigger" onclick="userManager.toggleMobileUnifiedMenu(this)">
+                    <i class="fas fa-bars"></i> Menu
+                </button>
+                <div class="mobile-unified-panel">
+                    ${mobileItemsCommon}
+                    ${user ? mobileItemsLoggedIn : mobileItemsLoggedOut}
+                </div>
+            </div>
+        `;
+    }
+
+    toggleMobileUnifiedMenu(buttonEl) {
+        const wrap = buttonEl ? buttonEl.closest('.mobile-unified-menu') : null;
+        if (!wrap) return;
+        wrap.classList.toggle('open');
+    }
+
+    closeMobileUnifiedMenu() {
+        document.querySelectorAll('.mobile-unified-menu.open').forEach((el) => el.classList.remove('open'));
+    }
+
+    bindMobileMenuHandlers() {
+        if (this._mobileMenuBound) return;
+        this._mobileMenuBound = true;
+        document.addEventListener('click', (event) => {
+            const insideMenu = event.target.closest('.mobile-unified-menu');
+            if (!insideMenu) this.closeMobileUnifiedMenu();
+        });
     }
 
     showLogin() {

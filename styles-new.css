@@ -968,6 +968,57 @@ body {
     color: white;
 }
 
+.mobile-unified-menu {
+    display: none;
+    position: relative;
+    width: 100%;
+}
+
+.mobile-unified-trigger {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.mobile-unified-panel {
+    display: none;
+    margin-top: 8px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.16);
+    padding: 10px;
+}
+
+.mobile-unified-menu.open .mobile-unified-panel {
+    display: grid;
+    gap: 8px;
+}
+
+.mobile-unified-panel a,
+.mobile-unified-panel button {
+    text-decoration: none;
+    border: none;
+    background: #f8fafc;
+    color: #1f2937;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+.mobile-menu-welcome {
+    font-weight: 700;
+    color: #374151;
+    padding: 6px 4px 2px;
+}
+
 /* Review System */
 .review-summary {
     text-align: center;
@@ -3443,6 +3494,14 @@ input[name="cardNumber"]:focus {
         width: 100% !important;
         display: flex !important;
         justify-content: center !important;
+    }
+
+    .desktop-user-actions {
+        display: none !important;
+    }
+
+    .mobile-unified-menu {
+        display: block !important;
     }
 
     .navbar .auth-buttons .user-menu {

@@ -75,6 +75,14 @@
             const authButtons = document.querySelector('.auth-buttons');
             if (!authButtons) return;
 
+             if (typeof userManager !== 'undefined' && typeof userManager.renderUnifiedAuthMenu === 'function') {
+                authButtons.innerHTML = userManager.renderUnifiedAuthMenu(currentUser || null);
+                if (typeof userManager.bindMobileMenuHandlers === 'function') {
+                    userManager.bindMobileMenuHandlers();
+                }
+                return;
+            }
+
             if (currentUser) {
                 const notifications = currentUser.notifications || [];
                 const unreadCount = notifications.filter(n => !n.read).length;
